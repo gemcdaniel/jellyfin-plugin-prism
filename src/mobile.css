@@ -139,27 +139,7 @@
   }
 }
 
-.layout-mobile .prism-inline-spotlight-stage {
-  min-height: 300px;
-  padding: 1.5rem 1.1rem;
-}
-
-.layout-mobile .prism-inline-spotlight .arrow-button {
-  display: none;
-}
-
-.layout-mobile .prism-inline-spotlight .button-container {
-  width: 100%;
-}
-
-.layout-mobile .prism-inline-spotlight .plot-container {
-  font-size: 0.85rem;
-}
-
-.layout-mobile .prism-inline-spotlight .play-button {
-  flex: 1 1 auto;
-  text-align: center;
-}
+/* Mobile inline spotlight rules are unified with narrow viewports in src/hero.css */
 
 .layout-mobile .prism-theme-tile {
   flex: 0 0 68%;

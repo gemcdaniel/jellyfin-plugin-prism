@@ -114,6 +114,107 @@
     }
   }
 
+  function attachSwipeHandlers(targetEl, opts) {
+    if (!targetEl || !opts) return;
+
+    var tracking = false;
+    var startX = 0;
+    var startY = 0;
+    var lastX = 0;
+    var lastY = 0;
+    var startTime = 0;
+    var lockedAxis = null;
+    var suppressClickUntil = 0;
+
+    targetEl.addEventListener('touchstart', function (e) {
+      if (!e.touches || e.touches.length !== 1 || opts.getCount() <= 1) {
+        if (tracking) {
+          tracking = false;
+          lockedAxis = null;
+          if (opts.onPauseChange) opts.onPauseChange(false);
+        }
+        return;
+      }
+      var touch = e.touches[0];
+      tracking = true;
+      lockedAxis = null;
+      startX = touch.clientX;
+      startY = touch.clientY;
+      lastX = startX;
+      lastY = startY;
+      startTime = Date.now();
+      if (opts.onPauseChange) opts.onPauseChange(true);
+    }, { passive: true });
+
+    targetEl.addEventListener('touchmove', function (e) {
+      if (!tracking) return;
+      if (!e.touches || e.touches.length !== 1) {
+        tracking = false;
+        lockedAxis = null;
+        if (opts.onPauseChange) opts.onPauseChange(false);
+        return;
+      }
+      var touch = e.touches[0];
+      lastX = touch.clientX;
+      lastY = touch.clientY;
+      var dx = lastX - startX;
+      var dy = lastY - startY;
+
+      if (!lockedAxis && (dx * dx + dy * dy) > 100) {
+        lockedAxis = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y';
+      }
+
+      if (lockedAxis === 'x' && e.cancelable) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    targetEl.addEventListener('touchend', function (e) {
+      if (!tracking) return;
+      tracking = false;
+      if (opts.onPauseChange) opts.onPauseChange(false);
+
+      var axis = lockedAxis;
+      lockedAxis = null;
+      if (axis !== 'x' || opts.getCount() <= 1) return;
+
+      var pt = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]);
+      var endX = pt ? pt.clientX : lastX;
+      var endY = pt ? pt.clientY : lastY;
+      var dx = endX - startX;
+      var dy = endY - startY;
+      var dt = Date.now() - startTime;
+      var isSwipe = (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy) * 1.2)
+        || (Math.abs(dx) >= 28 && dt < 300 && Math.abs(dx) > Math.abs(dy) * 1.5);
+
+      if (isSwipe) {
+        suppressClickUntil = Date.now() + 350;
+        if (dx < 0) {
+          opts.onNext();
+        } else {
+          opts.onPrev();
+        }
+      }
+    }, { passive: true });
+
+    targetEl.addEventListener('touchcancel', function () {
+      if (!tracking) return;
+      tracking = false;
+      lockedAxis = null;
+      if (opts.onPauseChange) opts.onPauseChange(false);
+    }, { passive: true });
+
+    targetEl.addEventListener('click', function (e) {
+      if (Date.now() < suppressClickUntil) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === 'function') {
+          e.stopImmediatePropagation();
+        }
+      }
+    }, true);
+  }
+
   function renderHeroSpotlight(hostPage, heroItems) {
     if (!state.config.enableHeroSpotlight || !heroItems || heroItems.length === 0) {
       return;
@@ -168,6 +269,7 @@
     var prevBtn = wrapper.querySelector('.arrow-button.prev');
     var nextBtn = wrapper.querySelector('.arrow-button.next');
     var paused = false;
+    var touchPaused = false;
     var layerToggle = false;
 
     function scheduleNextHeroTick() {
@@ -181,7 +283,7 @@
           clearHeroSpotlightTimers();
           return;
         }
-        if (paused || document.hidden) {
+        if (paused || touchPaused || document.hidden) {
           scheduleNextHeroTick();
           return;
         }
@@ -236,7 +338,7 @@
         }
 
         btnWrap.innerHTML =
-          '<button type="button" class="play-button" style="display:inline-flex;align-items:center;gap:0.4rem;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
+          '<button type="button" class="play-button" style="display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
           '<button type="button" class="detail-button">Details</button>' +
           wlHtml;
 
@@ -333,6 +435,16 @@
     wrapper.addEventListener('focusin', function () { paused = true; });
     wrapper.addEventListener('focusout', function () { paused = false; });
 
+    attachSwipeHandlers(wrapper, {
+      getCount: function () { return heroItems.length; },
+      onNext: function () { drawSlide(state.slideIndex + 1, 0); },
+      onPrev: function () { drawSlide(state.slideIndex - 1, 0); },
+      onPauseChange: function (p) {
+        touchPaused = p;
+        if (!p) paused = false;
+      }
+    });
+
     drawSlide(state.slideIndex, 0);
 
     var sectionsContainer = hostPage.querySelector('.homeSectionsContainer');
@@ -394,6 +506,7 @@
 
     var slideIdx = 0;
     var paused = false;
+    var touchPaused = false;
     var layerToggle = false;
 
     function scheduleInlineTick() {
@@ -406,7 +519,7 @@
           return;
         }
         var visible = state.inlineVisMap[section.Id] !== false;
-        if (!paused && !document.hidden && visible && items.length > 1) {
+        if (!paused && !touchPaused && !document.hidden && visible && items.length > 1) {
           drawInline(slideIdx + 1);
         } else {
           scheduleInlineTick();
@@ -439,7 +552,7 @@
       }
 
       btnWrap.innerHTML =
-        '<button type="button" class="play-button" style="display:inline-flex;align-items:center;gap:0.4rem;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
+        '<button type="button" class="play-button" style="display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
         '<button type="button" class="detail-button">Details</button>' +
         wlHtml;
 
@@ -476,6 +589,16 @@
     stage.addEventListener('mouseleave', function () { paused = false; });
     stage.addEventListener('focusin', function () { paused = true; });
     stage.addEventListener('focusout', function () { paused = false; });
+
+    attachSwipeHandlers(stage, {
+      getCount: function () { return items.length; },
+      onNext: function () { drawInline(slideIdx + 1); },
+      onPrev: function () { drawInline(slideIdx - 1); },
+      onPauseChange: function (p) {
+        touchPaused = p;
+        if (!p) paused = false;
+      }
+    });
 
     var obs = getSharedInlineObserver();
     if (obs) {

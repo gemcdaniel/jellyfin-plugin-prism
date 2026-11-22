@@ -1667,6 +1667,7 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   background-color: var(--prism-bg);
   overflow: hidden;
   border-bottom: none !important;
+  touch-action: pan-y pinch-zoom;
 }
 
 #slides-container[data-prism-injected="true"] {
@@ -1683,6 +1684,7 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   justify-content: flex-end;
   padding: 4.5rem var(--prism-gutter) 2.25rem;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 #slides-container[data-prism-injected="true"] .slide {
@@ -1822,6 +1824,7 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 
 #slides-container .plot-container,
 .prism-inline-spotlight .plot-container {
+  margin: 0.55rem 0 0;
   color: var(--prism-text-muted);
   max-width: 54ch;
   line-height: 1.5;
@@ -1844,6 +1847,9 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 
 #slides-container .play-button,
 .prism-inline-spotlight .play-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: var(--prism-gradient) !important;
   color: #FFFFFF !important;
   border: none !important;
@@ -1864,6 +1870,9 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 
 #slides-container .detail-button,
 .prism-inline-spotlight .detail-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background-color: rgba(255, 255, 255, 0.1) !important;
   color: var(--prism-text) !important;
   border: 1px solid var(--prism-border-strong) !important;
@@ -1917,18 +1926,38 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   z-index: 3;
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 0.45rem;
 }
 
 #slides-container .dot,
 .prism-inline-spotlight .dot {
+  position: relative;
   width: 0.5rem;
   height: 0.5rem;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  font-size: 0;
+  line-height: 0;
+  -webkit-appearance: none;
+  appearance: none;
   border-radius: var(--prism-radius-pill);
   background-color: rgba(255, 255, 255, 0.35);
   border: none;
   cursor: pointer;
   transition: width 200ms var(--prism-ease), background-color 200ms var(--prism-ease);
+}
+
+#slides-container .dot::after,
+.prism-inline-spotlight .dot::after {
+  content: "";
+  position: absolute;
+  inset: -8px -3px;
 }
 
 #slides-container .dot.active,
@@ -1968,6 +1997,7 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   padding: 2.25rem clamp(1.25rem, 3vw, 2.5rem);
   box-sizing: border-box;
   box-shadow: 0 18px 46px rgba(0, 0, 0, 0.72);
+  touch-action: pan-y pinch-zoom;
 }
 
 .prism-inline-scrim {
@@ -2034,37 +2064,383 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   background-color: rgba(14, 18, 30, 0.9) !important;
 }
 
-/* Mobile Adaptations for Media Bar (Keep Continue Watching peeking above fold) */
+/* Mobile Adaptations for Media Bar & Inline Spotlight (.layout-mobile & <=768px) */
 .layout-mobile #slides-container {
-  height: clamp(320px, 48vh, 390px);
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: clamp(360px, 52vh, 440px);
 }
 
 .layout-mobile #slides-container[data-prism-injected="true"] {
-  height: clamp(360px, 54vh, 430px);
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: clamp(410px, 56vh, 480px);
 }
 
-@media (max-width: 640px) {
-  #slides-container {
-    height: clamp(320px, 48vh, 390px);
-  }
+.layout-mobile #slides-container .slide {
+  flex: 1 0 auto;
+  height: auto;
+  padding: 3.5rem var(--prism-gutter) 0.9rem;
+}
+
+.layout-mobile #slides-container[data-prism-injected="true"] .slide {
+  padding-top: calc(var(--prism-hero-pull, var(--prism-header-offset, 64px)) + 4.25rem);
+}
+
+.layout-mobile #slides-container .backdrop-overlay {
+  background:
+    radial-gradient(ellipse 75% 50% at 75% 16%, rgba(var(--prism-dynamic-rgb), 0.14) 0%, rgba(0, 0, 0, 0) 68%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.04) 26%, rgba(0, 0, 0, 0.14) 44%, rgba(0, 0, 0, 0.72) 72%, var(--prism-bg) 100%);
+}
+
+.layout-mobile #slides-container .prism-hero-content {
+  width: 100%;
+}
+
+.layout-mobile #slides-container .prism-hero-reason {
+  margin-bottom: 0.45rem;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.68rem;
+}
+
+.layout-mobile #slides-container .logo-container {
+  max-width: min(260px, 76vw);
+  margin-bottom: 0.5rem;
+}
+
+.layout-mobile #slides-container .prism-hero-logo {
+  max-width: min(260px, 76vw);
+  max-height: 64px;
+}
+
+.layout-mobile #slides-container .prism-hero-title {
+  font-size: clamp(1.35rem, 6vw, 1.85rem);
+}
+
+.layout-mobile #slides-container .info-container {
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.layout-mobile #slides-container .genre-container,
+.layout-mobile #slides-container .rating-container {
+  padding: 0.14rem 0.45rem;
+  font-size: 0.72rem;
 }
 
 .layout-mobile #slides-container .plot-container {
   -webkit-line-clamp: 2;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
+  line-height: 1.42;
+  margin: 0.45rem 0 0;
+}
+
+.layout-mobile #slides-container .button-container {
+  width: 100%;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.layout-mobile #slides-container .play-button,
+.layout-mobile #slides-container .detail-button {
+  padding: 0.58rem 0.95rem !important;
+  font-size: 0.84rem;
+  min-height: 40px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.layout-mobile #slides-container .play-button {
+  flex: 1 1 auto;
+  text-align: center;
 }
 
 .layout-mobile #slides-container .arrow-button {
   display: none;
 }
 
-.layout-mobile #slides-container .button-container {
+.layout-mobile #slides-container .hero-controls-right,
+.layout-mobile #slides-container > .dots-container {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  justify-content: center;
+  padding: 0.65rem var(--prism-gutter) 0.9rem;
+  box-sizing: border-box;
+  background-color: var(--prism-bg);
+  z-index: 4;
+}
+
+.layout-mobile .prism-inline-spotlight-stage {
+  min-height: 300px;
+  padding: 4.5rem 1.05rem 1rem;
+}
+
+.layout-mobile .prism-inline-scrim {
+  background:
+    radial-gradient(ellipse 75% 50% at 75% 16%, rgba(var(--prism-dynamic-rgb), 0.14) 0%, rgba(0, 0, 0, 0) 68%),
+    linear-gradient(180deg, rgba(4, 6, 12, 0.26) 0%, rgba(4, 6, 12, 0.04) 26%, rgba(4, 6, 12, 0.2) 45%, rgba(4, 6, 12, 0.76) 74%, rgba(4, 6, 12, 0.94) 100%);
+}
+
+.layout-mobile .prism-inline-spotlight .prism-inline-content {
+  max-width: 100%;
   width: 100%;
 }
 
-.layout-mobile #slides-container .play-button {
+.layout-mobile .prism-inline-spotlight .logo-container {
+  max-width: min(230px, 74vw);
+  margin-bottom: 0.45rem;
+}
+
+.layout-mobile .prism-inline-spotlight .prism-hero-logo {
+  max-width: min(230px, 74vw);
+  max-height: 56px;
+}
+
+.layout-mobile .prism-inline-spotlight .prism-hero-title {
+  font-size: clamp(1.25rem, 5.5vw, 1.65rem);
+}
+
+.layout-mobile .prism-inline-spotlight .info-container {
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.layout-mobile .prism-inline-spotlight .genre-container {
+  padding: 0.14rem 0.45rem;
+  font-size: 0.72rem;
+}
+
+.layout-mobile .prism-inline-spotlight .plot-container {
+  font-size: 0.84rem;
+  line-height: 1.42;
+  margin: 0.45rem 0 0;
+}
+
+.layout-mobile .prism-inline-spotlight .button-container {
+  width: 100%;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.layout-mobile .prism-inline-spotlight .play-button,
+.layout-mobile .prism-inline-spotlight .detail-button {
+  padding: 0.56rem 0.9rem !important;
+  font-size: 0.84rem;
+  min-height: 40px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.layout-mobile .prism-inline-spotlight .play-button {
   flex: 1 1 auto;
   text-align: center;
+}
+
+.layout-mobile .prism-inline-spotlight .arrow-button {
+  display: none;
+}
+
+.layout-mobile .prism-inline-spotlight .hero-controls-right {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  justify-content: center;
+  margin-top: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  html:not(.layout-tv) #slides-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: clamp(360px, 52vh, 440px);
+  }
+
+  html:not(.layout-tv) #slides-container[data-prism-injected="true"] {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: clamp(410px, 56vh, 480px);
+  }
+
+  html:not(.layout-tv) #slides-container .slide {
+    flex: 1 0 auto;
+    height: auto;
+    padding: 3.5rem var(--prism-gutter) 0.9rem;
+  }
+
+  html:not(.layout-tv) #slides-container[data-prism-injected="true"] .slide {
+    padding-top: calc(var(--prism-hero-pull, var(--prism-header-offset, 64px)) + 4.25rem);
+  }
+
+  html:not(.layout-tv) #slides-container .backdrop-overlay {
+    background:
+      radial-gradient(ellipse 75% 50% at 75% 16%, rgba(var(--prism-dynamic-rgb), 0.14) 0%, rgba(0, 0, 0, 0) 68%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.04) 26%, rgba(0, 0, 0, 0.14) 44%, rgba(0, 0, 0, 0.72) 72%, var(--prism-bg) 100%);
+  }
+
+  html:not(.layout-tv) #slides-container .prism-hero-content {
+    width: 100%;
+  }
+
+  html:not(.layout-tv) #slides-container .prism-hero-reason {
+    margin-bottom: 0.45rem;
+    padding: 0.18rem 0.55rem;
+    font-size: 0.68rem;
+  }
+
+  html:not(.layout-tv) #slides-container .logo-container {
+    max-width: min(260px, 76vw);
+    margin-bottom: 0.5rem;
+  }
+
+  html:not(.layout-tv) #slides-container .prism-hero-logo {
+    max-width: min(260px, 76vw);
+    max-height: 64px;
+  }
+
+  html:not(.layout-tv) #slides-container .prism-hero-title {
+    font-size: clamp(1.35rem, 6vw, 1.85rem);
+  }
+
+  html:not(.layout-tv) #slides-container .info-container {
+    gap: 0.35rem;
+    font-size: 0.8rem;
+  }
+
+  html:not(.layout-tv) #slides-container .genre-container,
+  html:not(.layout-tv) #slides-container .rating-container {
+    padding: 0.14rem 0.45rem;
+    font-size: 0.72rem;
+  }
+
+  html:not(.layout-tv) #slides-container .plot-container {
+    -webkit-line-clamp: 2;
+    font-size: 0.84rem;
+    line-height: 1.42;
+    margin: 0.45rem 0 0;
+  }
+
+  html:not(.layout-tv) #slides-container .button-container {
+    width: 100%;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  html:not(.layout-tv) #slides-container .play-button,
+  html:not(.layout-tv) #slides-container .detail-button {
+    padding: 0.58rem 0.95rem !important;
+    font-size: 0.84rem;
+    min-height: 40px;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  html:not(.layout-tv) #slides-container .play-button {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  html:not(.layout-tv) #slides-container .arrow-button {
+    display: none;
+  }
+
+  html:not(.layout-tv) #slides-container .hero-controls-right,
+  html:not(.layout-tv) #slides-container > .dots-container {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    justify-content: center;
+    padding: 0.65rem var(--prism-gutter) 0.9rem;
+    box-sizing: border-box;
+    background-color: var(--prism-bg);
+    z-index: 4;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight-stage {
+    min-height: 300px;
+    padding: 4.5rem 1.05rem 1rem;
+  }
+
+  html:not(.layout-tv) .prism-inline-scrim {
+    background:
+      radial-gradient(ellipse 75% 50% at 75% 16%, rgba(var(--prism-dynamic-rgb), 0.14) 0%, rgba(0, 0, 0, 0) 68%),
+      linear-gradient(180deg, rgba(4, 6, 12, 0.26) 0%, rgba(4, 6, 12, 0.04) 26%, rgba(4, 6, 12, 0.2) 45%, rgba(4, 6, 12, 0.76) 74%, rgba(4, 6, 12, 0.94) 100%);
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .prism-inline-content {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .logo-container {
+    max-width: min(230px, 74vw);
+    margin-bottom: 0.45rem;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .prism-hero-logo {
+    max-width: min(230px, 74vw);
+    max-height: 56px;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .prism-hero-title {
+    font-size: clamp(1.25rem, 5.5vw, 1.65rem);
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .info-container {
+    gap: 0.35rem;
+    font-size: 0.8rem;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .genre-container {
+    padding: 0.14rem 0.45rem;
+    font-size: 0.72rem;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .plot-container {
+    font-size: 0.84rem;
+    line-height: 1.42;
+    margin: 0.45rem 0 0;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .button-container {
+    width: 100%;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .play-button,
+  html:not(.layout-tv) .prism-inline-spotlight .detail-button {
+    padding: 0.56rem 0.9rem !important;
+    font-size: 0.84rem;
+    min-height: 40px;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .play-button {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .arrow-button {
+    display: none;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .hero-controls-right {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.85rem;
+  }
 }
 
 /* ==========================================================================
@@ -2476,27 +2852,7 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   }
 }
 
-.layout-mobile .prism-inline-spotlight-stage {
-  min-height: 300px;
-  padding: 1.5rem 1.1rem;
-}
-
-.layout-mobile .prism-inline-spotlight .arrow-button {
-  display: none;
-}
-
-.layout-mobile .prism-inline-spotlight .button-container {
-  width: 100%;
-}
-
-.layout-mobile .prism-inline-spotlight .plot-container {
-  font-size: 0.85rem;
-}
-
-.layout-mobile .prism-inline-spotlight .play-button {
-  flex: 1 1 auto;
-  text-align: center;
-}
+/* Mobile inline spotlight rules are unified with narrow viewports in src/hero.css */
 
 .layout-mobile .prism-theme-tile {
   flex: 0 0 68%;
