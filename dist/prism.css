@@ -1339,6 +1339,7 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+  background-color: var(--prism-bg);
 }
 
 .prism-detail-backdrop img {
@@ -1377,8 +1378,21 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.72) 100%);
 }
 
+.itemDetailPage.has-prism-backdrop .itemBackdrop {
+  background: transparent !important;
+  background-image: none !important;
+  pointer-events: none;
+}
+
+.itemDetailPage.has-prism-backdrop .itemBackdrop::before,
 .itemDetailPage.has-prism-backdrop .itemBackdrop::after {
-  background: none;
+  background: none !important;
+  background-image: none !important;
+}
+
+.itemDetailPage.has-prism-backdrop .itemBackdrop > *:not(.itemBackdropProgressBar),
+.itemDetailPage.has-prism-backdrop .itemBackdrop img {
+  display: none !important;
 }
 
 .detailPagePrimaryContainer {

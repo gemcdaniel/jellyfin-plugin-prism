@@ -309,6 +309,16 @@ test('CSS includes mobile spotlight stacked pagination, clean dot reset, and tou
   assert.equal(mobileCss.includes('.layout-mobile .prism-inline-spotlight-stage'), false);
 });
 
+test('CSS clears native itemBackdrop image when Prism detail backdrop is active', () => {
+  const pagesCss = fs.readFileSync(path.join(rootDir, 'src', 'pages.css'), 'utf8');
+  const bundledCss = fs.readFileSync(path.join(rootDir, 'dist', 'prism.css'), 'utf8');
+
+  assert.ok(pagesCss.includes('.itemDetailPage.has-prism-backdrop .itemBackdrop'));
+  assert.ok(pagesCss.includes('background-image: none !important;'));
+  assert.ok(pagesCss.includes('.itemDetailPage.has-prism-backdrop .itemBackdrop img'));
+  assert.ok(bundledCss.includes('.itemDetailPage.has-prism-backdrop .itemBackdrop'));
+});
+
 function createMiniDom() {
   const parseAttrs = (raw) => {
     const attrs = new Map();
