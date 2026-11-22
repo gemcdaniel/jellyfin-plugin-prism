@@ -1,0 +1,267 @@
+/* ==========================================================================
+   Prism — TV 10-Foot Interface (.layout-tv) & LG WebOS 60fps Guardrails
+   ========================================================================== */
+
+.layout-tv {
+  --prism-gutter: 3.5vw;
+  --prism-header-height: 4.75rem;
+}
+
+/* LG WebOS Performance Guardrail: disable backdrop-filter in TV layout */
+.layout-tv .skinHeader,
+.layout-tv .skinHeader.semiTransparent,
+.layout-tv .skinHeader-withBackground,
+.layout-tv .MuiAppBar-root,
+.layout-tv .dialog,
+.layout-tv .actionSheet,
+.layout-tv .MuiDrawer-paper,
+.layout-tv .MuiDialog-paper,
+.layout-tv .MuiMenu-paper,
+.layout-tv .MuiPopover-paper,
+.layout-tv .cardBox,
+.layout-tv .cardOverlayContainer,
+.layout-tv .mainDrawer {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.layout-tv .skinHeader,
+.layout-tv .skinHeader.semiTransparent,
+.layout-tv .skinHeader-withBackground,
+.layout-tv .MuiAppBar-root {
+  background-color: rgba(8, 10, 16, 0.92) !important;
+}
+
+.layout-tv .dialog,
+.layout-tv .actionSheet,
+.layout-tv .MuiDrawer-paper,
+.layout-tv .MuiDialog-paper,
+.layout-tv .MuiMenu-paper,
+.layout-tv .MuiPopover-paper {
+  background-color: #111522 !important;
+}
+
+.layout-tv .MuiFilledInput-root {
+  background-color: #0D1019 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Floating TV Header Alignment (overflow visible prevents Home/Favorites focus clipping) */
+.layout-tv .skinHeader,
+.layout-tv .MuiAppBar-root,
+.layout-tv .MuiToolbar-root,
+.layout-tv .headerTabs,
+.layout-tv .emby-tabs-slider {
+  overflow: visible !important;
+}
+
+.layout-tv .headerTop {
+  min-height: var(--prism-header-height);
+}
+
+.layout-tv .headerTabs {
+  padding-block: 0.35rem;
+}
+
+.layout-tv .emby-tab-button {
+  font-size: 1rem;
+  padding: 0.55rem 1.25rem !important;
+}
+
+/* 10-Foot Typography & Overscan Safe Margins */
+.layout-tv .verticalSection {
+  margin-bottom: 0.5rem !important;
+}
+
+.layout-tv .sectionTitleContainer {
+  margin-bottom: 0.1rem !important;
+}
+
+.layout-tv .sectionTitle {
+  font-size: 1.38rem;
+  font-weight: 700;
+}
+
+.layout-tv .card {
+  padding: 0.3rem !important;
+}
+
+.layout-tv .cardBox-bottompadded {
+  margin: 0.2rem 0.15rem 0.35rem !important;
+}
+
+.layout-tv .emby-scroller,
+.layout-tv .prism-scroller,
+.layout-tv .itemsContainer {
+  padding-top: 0.65rem !important;
+  padding-bottom: 0.65rem !important;
+}
+
+.layout-tv .cardText-first {
+  font-size: 1rem;
+}
+
+.layout-tv .cardText-secondary {
+  font-size: 0.875rem;
+}
+
+/* Unmistakable 10-Foot D-Pad Focus Ring (GPU-composited transform + shadow) */
+.layout-tv .cardBox {
+  will-change: transform;
+}
+
+.layout-tv .card:focus,
+.layout-tv .cardBox:focus {
+  outline: none !important;
+}
+
+/* Clear Jellyfin's native inner image focus border so only .cardBox frames image + label */
+.layout-tv .card:focus .cardScalable,
+.layout-tv .card:focus-within .cardScalable,
+.layout-tv .card:focus .cardContent,
+.layout-tv .card:focus-within .cardContent,
+.layout-tv .cardContent:focus,
+.layout-tv .card:focus .cardImageContainer,
+.layout-tv .card:focus-within .cardImageContainer,
+.layout-tv .cardImageContainer:focus,
+.layout-tv .card:focus .cardScalable::after,
+.layout-tv .card:focus-within .cardScalable::after {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.layout-tv .card:focus .cardBox,
+.layout-tv .card:focus-within .cardBox,
+.layout-tv .cardBox:focus {
+  transform: scale(1.025);
+  border-color: var(--prism-focus-ring) !important;
+  box-shadow:
+    0 0 0 2.5px var(--prism-focus-ring),
+    0 0 10px var(--prism-focus-glow),
+    0 6px 14px rgba(0, 0, 0, 0.75) !important;
+  position: relative;
+  z-index: 15;
+}
+
+.layout-tv .emby-button:focus,
+.layout-tv .navMenuOption:focus,
+.layout-tv .listItem:focus,
+.layout-tv .sectionTitleTextButton:focus {
+  outline: none !important;
+  transform: scale(1.04);
+  box-shadow:
+    0 0 0 2.5px var(--prism-focus-ring),
+    0 0 18px var(--prism-focus-glow) !important;
+  position: relative;
+  z-index: 15;
+}
+
+/* Header & Navigation Tab Focus: crisp inset/tight ring without clipping */
+.layout-tv .emby-tab-button:focus,
+.layout-tv .headerButton:focus,
+.layout-tv .MuiAppBar-root .MuiButton-root:focus,
+.layout-tv .MuiAppBar-root .MuiIconButton-root:focus {
+  outline: none !important;
+  transform: none !important;
+  background: var(--prism-gradient) !important;
+  color: #FFFFFF !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.9),
+    0 0 0 2px var(--prism-focus-ring) !important;
+  position: relative;
+  z-index: 15;
+}
+
+/* Live TV Guide: bounded vertical scroller + inset station/program focus */
+.layout-tv .tvguide {
+  display: flex !important;
+  flex-direction: column !important;
+  height: calc(100vh - var(--prism-header-height)) !important;
+  max-height: calc(100vh - var(--prism-header-height)) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.layout-tv .tvguide .tvGuideHeader {
+  flex: 0 0 auto !important;
+}
+
+.layout-tv .tvguide .guideVerticalScroller,
+.layout-tv .tvguide .guideVerticalScroller.emby-scroller {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scroll-padding-block: 72px !important;
+}
+
+.layout-tv .guide-channelHeaderCell:focus,
+.layout-tv .programCell:focus {
+  outline: none !important;
+  transform: none !important;
+  background: linear-gradient(135deg, rgba(124, 92, 255, 0.34), rgba(0, 212, 255, 0.22)) !important;
+  box-shadow: inset 0 0 0 2px var(--prism-focus-ring) !important;
+  color: #FFFFFF !important;
+  position: relative;
+  z-index: 10;
+}
+
+/* LG WebOS 60fps Guardrails & Focus Rings for Discovery, Spotlights & Themes */
+.layout-tv .prism-inline-spotlight,
+.layout-tv .prism-inline-spotlight .detail-button,
+.layout-tv .prism-inline-spotlight .arrow-button,
+.layout-tv .prism-theme-modal-backdrop,
+.layout-tv .prism-theme-modal,
+.layout-tv .prism-watchlist-btn,
+.layout-tv .prism-load-more-btn,
+.layout-tv .prism-theme-tile {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.layout-tv .prism-backdrop-layer,
+.layout-tv .prism-backdrop-layer.prism-kb-active {
+  animation: none !important;
+  transform: none !important;
+}
+
+.layout-tv .prism-card-wl-btn {
+  display: none !important;
+}
+
+.layout-tv .prism-theme-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.88) !important;
+}
+
+.layout-tv .prism-theme-modal {
+  background-color: #111522 !important;
+}
+
+.layout-tv .prism-theme-tile {
+  width: 310px;
+}
+
+.layout-tv .prism-card-thumb {
+  width: 310px !important;
+}
+
+.layout-tv .prism-theme-tile:focus,
+.layout-tv .prism-inline-spotlight .play-button:focus,
+.layout-tv .prism-inline-spotlight .detail-button:focus,
+.layout-tv .prism-inline-spotlight .arrow-button:focus,
+.layout-tv .prism-load-more-btn:focus,
+.layout-tv .prism-watchlist-btn:focus,
+.layout-tv .prism-theme-modal-close:focus {
+  outline: none !important;
+  transform: scale(1.04);
+  border-color: var(--prism-focus-ring) !important;
+  box-shadow:
+    0 0 0 2.5px var(--prism-focus-ring),
+    0 0 18px var(--prism-focus-glow) !important;
+  position: relative;
+  z-index: 15;
+}

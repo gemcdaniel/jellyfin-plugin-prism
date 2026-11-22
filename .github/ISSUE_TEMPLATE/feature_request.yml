@@ -1,0 +1,27 @@
+name: Feature Request
+description: Suggest an improvement or new capability for Prism
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Description
+      description: What would you like Prism to do?
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why is this useful?
+      description: Describe your use case across Desktop, Mobile, or TV layouts.
+    validations:
+      required: true
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Client Targets
+      options:
+        - label: Desktop Web
+        - label: Android Mobile (.layout-mobile)
+        - label: LG WebOS TV (.layout-tv)

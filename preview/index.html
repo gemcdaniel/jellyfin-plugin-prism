@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en" class="layout-desktop">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism — Jellyfin Preview Harness</title>
+  <link rel="stylesheet" href="../dist/prism.css" />
+  <style>
+    /* Preview harness chrome & base structural helpers matching Jellyfin Web layout */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    }
+
+    /* Preview Toolbar (isolated from theme selectors) */
+    #preview-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.65rem 1.25rem;
+      background: #07080D;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 12px;
+      color: #F4F7FF;
+    }
+
+    #preview-toolbar .tb-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    #preview-toolbar .tb-label {
+      color: #9AA6C4;
+      font-weight: 600;
+      margin-right: 0.2rem;
+    }
+
+    #preview-toolbar button {
+      background: #121624;
+      color: #C4CEE5;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      padding: 0.35rem 0.8rem;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    #preview-toolbar button.active {
+      background: linear-gradient(135deg, #7C5CFF, #00D4FF);
+      color: #FFFFFF;
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    /* Viewport Frame Wrapper */
+    #preview-stage {
+      padding: 0;
+    }
+
+    #preview-stage.frame-mobile {
+      padding: 1.5rem 1rem 2.5rem;
+      display: flex;
+      justify-content: center;
+      background: #050608;
+      min-height: calc(100vh - 54px);
+    }
+
+    #preview-stage.frame-tv {
+      padding: 1.25rem;
+      display: flex;
+      justify-content: center;
+      background: #050608;
+      min-height: calc(100vh - 54px);
+    }
+
+    #preview-frame {
+      width: 100%;
+      position: relative;
+      background: var(--prism-bg);
+    }
+
+    #preview-stage.frame-mobile #preview-frame {
+      width: 390px;
+      max-width: 100%;
+      height: 844px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      border-radius: 30px;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9);
+      transform: translateZ(0);
+    }
+
+    #preview-stage.frame-tv #preview-frame {
+      width: 1280px;
+      max-width: 100%;
+      min-height: 720px;
+      overflow-x: hidden;
+      border-radius: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9);
+      transform: translateZ(0);
+    }
+
+    /* Minimal structural layout mirroring Jellyfin Web CSS primitives */
+    .backgroundContainer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .mainAnimatedPages {
+      position: relative;
+      z-index: 1;
+    }
+
+    .skinHeader {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .headerTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 3.25rem;
+    }
+
+    .headerLeft,
+    .headerRight {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .headerButton {
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 0.45rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.92rem;
+    }
+
+    .pageTitleWithLogo {
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .jf-logo-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #7C5CFF, #00D4FF);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #FFF;
+    }
+
+    .headerTabs {
+      display: flex;
+      justify-content: center;
+    }
+
+    .emby-tabs-slider {
+      display: flex;
+      align-items: center;
+    }
+
+    .emby-tab-button {
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .scrollSlider {
+      display: grid;
+      grid-auto-flow: column;
+      gap: 0.35rem;
+    }
+
+    .layout-desktop .backdropCard,
+    .layout-tv .backdropCard {
+      width: 290px;
+    }
+
+    .layout-desktop .portraitCard,
+    .layout-tv .portraitCard {
+      width: 185px;
+    }
+
+    .card {
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .cardScalable {
+      position: relative;
+      width: 100%;
+    }
+
+    .cardPadder {
+      width: 100%;
+    }
+
+    .portraitCard .cardPadder,
+    .overflowPortraitCard .cardPadder {
+      padding-bottom: 150%;
+    }
+
+    .backdropCard .cardPadder,
+    .overflowBackdropCard .cardPadder {
+      padding-bottom: 56.25%;
+    }
+
+    .squareCard .cardPadder,
+    .overflowSquareCard .cardPadder {
+      padding-bottom: 100%;
+    }
+
+    .cardImageContainer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .cardOverlayContainer {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+
+    .card:hover .cardOverlayContainer,
+    .card:focus-within .cardOverlayContainer {
+      opacity: 1;
+    }
+
+    .cardOverlayFab-primary {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .itemProgressBar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 3;
+    }
+
+    .itemProgressBarForeground {
+      height: 100%;
+    }
+
+    .cardIndicators {
+      position: absolute;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+    }
+
+    .playedIndicator,
+    .countIndicator {
+      font-size: 12px;
+      padding: 0.15rem 0.48rem;
+      line-height: 1.2;
+    }
+
+    .verticalSection {
+      margin-top: 1.5rem;
+    }
+
+    .emby-scroller {
+      overflow-x: auto;
+    }
+
+    /* Media Bar Helper Placement */
+    #slides-container .arrow-button.prev {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    #slides-container .arrow-button.next {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    #slides-container .dots-container {
+      position: absolute;
+      bottom: 1.15rem;
+      right: var(--prism-gutter);
+    }
+
+    .hero-title-fallback {
+      margin: 0;
+      font-size: clamp(1.6rem, 3.6vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+    }
+
+    /* Item Detail Structural Helpers */
+    .itemDetailPage .itemBackdrop {
+      height: 360px;
+    }
+
+    .itemDetailPage .itemBackdrop img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .detailPagePrimaryContainer {
+      position: relative;
+      z-index: 2;
+      margin-top: -5.5rem;
+      padding-bottom: 1.5rem;
+    }
+
+    .detailHeaderRow {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-end;
+    }
+
+    .detailPosterBox {
+      width: 170px;
+      aspect-ratio: 2 / 3;
+      border-radius: var(--prism-radius-md);
+      border: 1px solid var(--prism-border-strong);
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.85);
+    }
+
+    .layout-mobile .detailPosterBox {
+      display: none;
+    }
+
+    .detailPosterBox img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .listItem {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .listItemImage {
+      width: 136px;
+      aspect-ratio: 16 / 9;
+      flex-shrink: 0;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .listItemBody {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .listItemBodyText {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .listItemBodyText.secondary {
+      font-weight: 400;
+      font-size: 0.82rem;
+      margin-top: 0.2rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Preview Controls -->
+  <div id="preview-toolbar">
+    <div class="tb-group">
+      <span class="tb-label">Client Layout:</span>
+      <button type="button" data-set-layout="layout-desktop" class="active">Desktop Web</button>
+      <button type="button" data-set-layout="layout-tv">TV 10-Foot (.layout-tv)</button>
+      <button type="button" data-set-layout="layout-mobile">Mobile (.layout-mobile)</button>
+    </div>
+
+    <div class="tb-group">
+      <span class="tb-label">Page:</span>
+      <button type="button" data-set-page="home" class="active">Home</button>
+      <button type="button" data-set-page="detail">Item Detail</button>
+    </div>
+
+    <div class="tb-group">
+      <span class="tb-label">Hero:</span>
+      <button type="button" data-set-mediabar="on" class="active">With Media Bar</button>
+      <button type="button" data-set-mediabar="off">Pure CSS Only</button>
+    </div>
+  </div>
+
+  <!-- Preview Stage -->
+  <div id="preview-stage">
+    <div id="preview-frame">
+      <div class="backgroundContainer withBackdrop" id="bg-backdrop"></div>
+
+      <header class="skinHeader skinHeader-withBackground semiTransparent">
+        <div class="headerTop">
+          <div class="headerLeft">
+            <button type="button" class="headerButton emby-button" aria-label="Menu">☰</button>
+            <div class="pageTitleWithLogo">
+              <span class="jf-logo-mark">J</span>
+              <span>Jellyfin</span>
+            </div>
+          </div>
+          <div class="headerRight">
+            <button type="button" class="headerButton emby-button" aria-label="Cast">Cast</button>
+            <button type="button" class="headerButton emby-button" aria-label="Search">Search</button>
+            <button type="button" class="headerButton emby-button" aria-label="User">GM</button>
+          </div>
+        </div>
+        <div class="headerTabs">
+          <div class="emby-tabs-slider">
+            <button type="button" class="emby-tab-button emby-tab-button-active" data-page-link="home">Home</button>
+            <button type="button" class="emby-tab-button">Movies</button>
+            <button type="button" class="emby-tab-button">Shows</button>
+            <button type="button" class="emby-tab-button" data-page-link="detail">Favorites</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="mainAnimatedPages">
+        <!-- HOME PAGE -->
+        <div id="page-home">
+          <!-- Jellyfin Media Bar Plugin DOM -->
+          <section id="slides-container" aria-label="Featured Media Bar">
+            <div class="slide" id="active-slide"></div>
+            <button type="button" class="arrow-button prev" id="slide-prev" aria-label="Previous Slide">‹</button>
+            <button type="button" class="arrow-button next" id="slide-next" aria-label="Next Slide">›</button>
+            <div class="dots-container" id="slide-dots"></div>
+          </section>
+
+          <div class="homeSectionsContainer">
+            <!-- Continue Watching -->
+            <section class="verticalSection">
+              <div class="sectionTitleContainer">
+                <a class="sectionTitleTextButton emby-button" tabindex="0">
+                  <h2 class="sectionTitle">Continue Watching</h2>
+                  <span>›</span>
+                </a>
+              </div>
+              <div class="emby-scroller">
+                <div class="scrollSlider" id="row-continue"></div>
+              </div>
+            </section>
+
+            <!-- Recently Added -->
+            <section class="verticalSection">
+              <div class="sectionTitleContainer">
+                <a class="sectionTitleTextButton emby-button" tabindex="0">
+                  <h2 class="sectionTitle">Recently Added</h2>
+                  <span>›</span>
+                </a>
+              </div>
+              <div class="emby-scroller">
+                <div class="scrollSlider" id="row-recent"></div>
+              </div>
+            </section>
+
+            <!-- Recommended -->
+            <section class="verticalSection">
+              <div class="sectionTitleContainer">
+                <a class="sectionTitleTextButton emby-button" tabindex="0">
+                  <h2 class="sectionTitle">4K HDR Spotlight</h2>
+                  <span>›</span>
+                </a>
+              </div>
+              <div class="emby-scroller">
+                <div class="scrollSlider" id="row-spotlight"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- ITEM DETAIL PAGE -->
+        <div id="page-detail" class="itemDetailPage hidden">
+          <div class="itemBackdrop">
+            <img id="detail-backdrop-img" alt="Solaris Drift backdrop" />
+          </div>
+          <div class="detailPageWrapperContainer">
+            <div class="detailPagePrimaryContainer">
+              <div class="detailHeaderRow">
+                <div class="detailPosterBox">
+                  <img id="detail-poster-img" alt="Solaris Drift poster" />
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div class="detailRibbon">
+                    <h1 class="itemName" style="margin:0 0 0.5rem;">Solaris Drift</h1>
+                    <div class="itemMiscInfo" style="margin-bottom: 0.85rem;">
+                      <span>2026</span>
+                      <span>2h 18m</span>
+                      <span class="mediaInfoOfficialRating">PG-13</span>
+                      <span class="mediaInfoItem">4K</span>
+                      <span class="mediaInfoItem">HDR10</span>
+                      <span class="mediaInfoItem">Atmos</span>
+                      <span class="starRatingContainer">★ 8.7</span>
+                    </div>
+                  </div>
+                  <div class="mainDetailButtons" style="margin-bottom: 1rem;">
+                    <button type="button" class="emby-button btnResume">▶ Resume · 42m left</button>
+                    <button type="button" class="emby-button">Trailer</button>
+                    <button type="button" class="emby-button">✓ Watched</button>
+                    <button type="button" class="emby-button">♥ Favorite</button>
+                  </div>
+                  <p class="overview" style="margin:0;">
+                    An orbital cartographer intercepts a silent distress beacon orbiting twin desert moons, forcing a high-stakes descent through magnetic storms before solar flare blackout.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="detailPageContent" style="padding-bottom: 3rem;">
+              <div class="verticalSection">
+                <div class="sectionTitleContainer" style="padding-inline: 0;">
+                  <h2 class="sectionTitle">Chapters &amp; Up Next</h2>
+                </div>
+                <div id="detail-chapters"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      function svgDataUri(c1, c2, accent, motif) {
+        let shape = '';
+        if (motif === 'desert') {
+          shape = `<circle cx="74%" cy="32%" r="55" fill="${accent}" opacity="0.75"/><path d="M0 190 Q140 135 280 175 T480 155 L480 270 L0 270 Z" fill="#130905" opacity="0.88"/>`;
+        } else if (motif === 'cyber') {
+          shape = `<rect x="40" y="70" width="44" height="200" fill="#0B0F22"/><rect x="115" y="40" width="60" height="230" fill="#101736"/><rect x="290" y="55" width="54" height="215" fill="#0B0F22"/><line x1="142" y1="55" x2="142" y2="235" stroke="${accent}" stroke-width="3"/><line x1="0" y1="210" x2="480" y2="210" stroke="#7C5CFF" stroke-width="2" opacity="0.65"/>`;
+        } else if (motif === 'abyss') {
+          shape = `<polygon points="170,0 310,0 390,270 90,270" fill="${accent}" opacity="0.22"/><circle cx="240" cy="145" r="36" fill="none" stroke="${accent}" stroke-width="2.5" opacity="0.75"/>`;
+        } else if (motif === 'alpine') {
+          shape = `<polygon points="0,270 110,120 220,270" fill="#0C1418"/><polygon points="150,270 270,85 390,270" fill="#080D11"/><polygon points="310,270 410,140 480,270" fill="#0E171D"/><path d="M0 60 Q180 20 480 55" stroke="${accent}" stroke-width="18" fill="none" opacity="0.24"/>`;
+        } else {
+          shape = `<circle cx="76%" cy="72%" r="120" fill="${accent}" opacity="0.32"/><circle cx="24%" cy="28%" r="2.5" fill="#FFF" opacity="0.8"/><circle cx="52%" cy="18%" r="2" fill="#FFF" opacity="0.7"/>`;
+        }
+
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs><rect width="480" height="270" fill="url(#g)"/>${shape}</svg>`;
+        return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+      }
+
+      const SLIDES = [
+        {
+          title: 'SOLARIS DRIFT',
+          year: '2026',
+          runtime: '2h 18m',
+          rating: '8.7',
+          genres: ['Sci-Fi', '4K HDR10', 'Atmos'],
+          plot: 'An orbital cartographer intercepts a silent distress beacon orbiting twin desert moons, forcing a high-stakes descent before solar flare blackout.',
+          bg: svgDataUri('#2D150A', '#0D0708', '#F5A623', 'desert')
+        },
+        {
+          title: 'NEON VALKYRIE',
+          year: '2026',
+          runtime: 'S2 · E6',
+          rating: '9.1',
+          genres: ['Cyberpunk', 'Dolby Vision', '5.1'],
+          plot: 'In rain-drenched Neo-Veridia, courier-turned-whistleblower Kira traces stolen memory ledgers across the elevated maglev underworld.',
+          bg: svgDataUri('#180E3E', '#090D1C', '#00D4FF', 'cyber')
+        },
+        {
+          title: 'THE ABYSSAL TRENCH',
+          year: '2025',
+          runtime: '1h 56m',
+          rating: '8.4',
+          genres: ['Thriller', '4K HDR10+'],
+          plot: 'Four kilometers beneath the Pacific, a deep-sea salvage crew uncovers a cold-war listening post broadcasting telemetry from the future.',
+          bg: svgDataUri('#042230', '#030B12', '#38BDF8', 'abyss')
+        }
+      ];
+
+      const CONTINUE = [
+        { title: 'Neon Valkyrie', sub: 'S2:E6 · Ghost Protocol', progress: 68, art: svgDataUri('#180E3E', '#0A0D1C', '#00D4FF', 'cyber') },
+        { title: 'Solaris Drift', sub: 'Movie · 42m left', progress: 54, art: svgDataUri('#35190D', '#100806', '#F5A623', 'desert') },
+        { title: 'Apex Velocity', sub: 'Documentary · 38m left', progress: 34, art: svgDataUri('#2E0B10', '#120709', '#E5484D', 'orbit') },
+        { title: 'Orbital Nine', sub: 'S1:E3 · Airlock Zero', progress: 48, art: svgDataUri('#0C1838', '#060A16', '#60A5FA', 'orbit') },
+        { title: 'The Abyssal Trench', sub: 'Movie · 1h 12m left', progress: 22, art: svgDataUri('#05202E', '#030A10', '#38BDF8', 'abyss') }
+      ];
+
+      const RECENT = [
+        { title: 'The Abyssal Trench', sub: '2025 · Thriller', badge: '4K', art: svgDataUri('#042230', '#030B12', '#38BDF8', 'abyss') },
+        { title: 'Chronicles of Aethel', sub: 'Series · 8 Episodes', badge: '8', art: svgDataUri('#0E2428', '#081014', '#34D399', 'alpine') },
+        { title: 'Midnight Jazz Club', sub: '2025 · Concert', badge: '✓', art: svgDataUri('#28150E', '#120906', '#FBBF24', 'desert') },
+        { title: 'Nordic Silence', sub: '2024 · Drama', badge: 'HD', art: svgDataUri('#15202B', '#0A0F14', '#93C5FD', 'alpine') },
+        { title: 'Starlight Expressway', sub: 'S1 · Anime', badge: '12', art: svgDataUri('#241036', '#0D0714', '#F472B6', 'orbit') },
+        { title: 'Solaris Drift', sub: '2026 · Sci-Fi', badge: '4K', art: svgDataUri('#35190D', '#100806', '#F5A623', 'desert') }
+      ];
+
+      const state = {
+        layout: 'layout-desktop',
+        page: 'home',
+        mediabar: 'on',
+        slideIdx: 0
+      };
+
+      function renderSlide() {
+        const s = SLIDES[state.slideIdx];
+        document.getElementById('active-slide').innerHTML = `
+          <img class="backdrop" src="${s.bg}" alt="${s.title}" />
+          <div class="backdrop-overlay"></div>
+          <div class="logo-container">
+            <h1 class="hero-title-fallback">${s.title}</h1>
+          </div>
+          <div class="info-container">
+            <span>${s.year}</span>
+            <span>•</span>
+            <span>${s.runtime}</span>
+            <span>•</span>
+            <span>★ ${s.rating}</span>
+            ${s.genres.map(g => `<span class="genre-container">${g}</span>`).join('')}
+          </div>
+          <p class="plot-container">${s.plot}</p>
+          <div class="button-container">
+            <button type="button" class="play-button" data-open-detail="true">▶ Play</button>
+            <button type="button" class="detail-button" data-open-detail="true">More Info</button>
+          </div>
+        `;
+
+        document.getElementById('slide-dots').innerHTML = SLIDES.map((_, idx) =>
+          `<button type="button" class="dot ${idx === state.slideIdx ? 'active' : ''}" data-dot="${idx}" aria-label="Slide ${idx + 1}"></button>`
+        ).join('');
+      }
+
+      function renderRows() {
+        document.getElementById('row-continue').innerHTML = CONTINUE.map(item => `
+          <div class="card backdropCard overflowBackdropCard" tabindex="0" data-open-detail="true">
+            <div class="cardBox cardBox-bottompadded">
+              <div class="cardScalable">
+                <div class="cardPadder"></div>
+                <div class="cardImageContainer" style="background-image:url('${item.art}');"></div>
+                <div class="cardOverlayContainer">
+                  <button type="button" class="cardOverlayFab-primary" aria-label="Play">▶</button>
+                </div>
+                <div class="itemProgressBar">
+                  <div class="itemProgressBarForeground" style="width:${item.progress}%;"></div>
+                </div>
+              </div>
+              <div class="cardFooter">
+                <div class="cardText cardText-first">${item.title}</div>
+                <div class="cardText cardText-secondary">${item.sub}</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        const renderPortraits = list => list.map(item => `
+          <div class="card portraitCard overflowPortraitCard" tabindex="0" data-open-detail="true">
+            <div class="cardBox cardBox-bottompadded">
+              <div class="cardScalable">
+                <div class="cardPadder"></div>
+                <div class="cardImageContainer" style="background-image:url('${item.art}');"></div>
+                <div class="cardOverlayContainer">
+                  <button type="button" class="cardOverlayFab-primary" aria-label="Play">▶</button>
+                </div>
+                <div class="cardIndicators">
+                  <span class="${item.badge === '✓' ? 'playedIndicator' : 'countIndicator'}">${item.badge}</span>
+                </div>
+              </div>
+              <div class="cardFooter">
+                <div class="cardText cardText-first">${item.title}</div>
+                <div class="cardText cardText-secondary">${item.sub}</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        document.getElementById('row-recent').innerHTML = renderPortraits(RECENT);
+        document.getElementById('row-spotlight').innerHTML = renderPortraits([...RECENT].reverse());
+      }
+
+      function renderDetail() {
+        const heroArt = SLIDES[0].bg;
+        document.getElementById('detail-backdrop-img').src = heroArt;
+        document.getElementById('detail-poster-img').src = heroArt;
+        document.getElementById('detail-chapters').innerHTML = CONTINUE.slice(0, 3).map((ep, idx) => `
+          <div class="listItem" tabindex="0">
+            <div class="listItemImage" style="background-image:url('${ep.art}');">
+              <div class="itemProgressBar">
+                <div class="itemProgressBarForeground" style="width:${ep.progress}%;"></div>
+              </div>
+            </div>
+            <div class="listItemBody">
+              <div class="listItemBodyText">${idx + 1}. ${ep.title}</div>
+              <div class="listItemBodyText secondary">${ep.sub}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function applyState() {
+        document.documentElement.className = state.layout;
+        const stage = document.getElementById('preview-stage');
+        stage.className = state.layout === 'layout-mobile'
+          ? 'frame-mobile'
+          : state.layout === 'layout-tv'
+          ? 'frame-tv'
+          : '';
+
+        document.getElementById('page-home').classList.toggle('hidden', state.page !== 'home');
+        document.getElementById('page-detail').classList.toggle('hidden', state.page !== 'detail');
+        document.getElementById('slides-container').classList.toggle('hidden', state.mediabar === 'off');
+
+        document.querySelectorAll('[data-set-layout]').forEach(b => b.classList.toggle('active', b.dataset.setLayout === state.layout));
+        document.querySelectorAll('[data-set-page]').forEach(b => b.classList.toggle('active', b.dataset.setPage === state.page));
+        document.querySelectorAll('[data-set-mediabar]').forEach(b => b.classList.toggle('active', b.dataset.setMediabar === state.mediabar));
+      }
+
+      document.addEventListener('click', (e) => {
+        const layoutBtn = e.target.closest('[data-set-layout]');
+        if (layoutBtn) {
+          state.layout = layoutBtn.dataset.setLayout;
+          applyState();
+          return;
+        }
+        const pageBtn = e.target.closest('[data-set-page]');
+        if (pageBtn) {
+          state.page = pageBtn.dataset.setPage;
+          applyState();
+          return;
+        }
+        const mbBtn = e.target.closest('[data-set-mediabar]');
+        if (mbBtn) {
+          state.mediabar = mbBtn.dataset.setMediabar;
+          applyState();
+          return;
+        }
+        const dotBtn = e.target.closest('[data-dot]');
+        if (dotBtn) {
+          state.slideIdx = Number(dotBtn.dataset.dot);
+          renderSlide();
+          return;
+        }
+        const pageLink = e.target.closest('[data-page-link]');
+        if (pageLink) {
+          state.page = pageLink.dataset.pageLink;
+          applyState();
+          return;
+        }
+        if (e.target.closest('[data-open-detail]')) {
+          state.page = 'detail';
+          applyState();
+        }
+      });
+
+      document.getElementById('slide-prev').addEventListener('click', () => {
+        state.slideIdx = (state.slideIdx - 1 + SLIDES.length) % SLIDES.length;
+        renderSlide();
+      });
+
+      document.getElementById('slide-next').addEventListener('click', () => {
+        state.slideIdx = (state.slideIdx + 1) % SLIDES.length;
+        renderSlide();
+      });
+
+      renderSlide();
+      renderRows();
+      renderDetail();
+      applyState();
+    })();
+  </script>
+</body>
+</html>

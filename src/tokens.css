@@ -1,0 +1,55 @@
+/* ==========================================================================
+   Prism — Design Tokens
+   Override any variable in Jellyfin's Custom CSS box AFTER the @import line.
+   ========================================================================== */
+
+:root {
+  /* True-black OLED surfaces & elevated glass tones */
+  --prism-bg: #000000;
+  --prism-bg-elevated: #0A0C12;
+  --prism-surface: rgba(14, 18, 30, 0.78);
+  --prism-surface-solid: #111522;
+  --prism-surface-hover: rgba(24, 31, 52, 0.88);
+
+  /* Crisp glass rims & hairlines */
+  --prism-border: rgba(255, 255, 255, 0.11);
+  --prism-border-strong: rgba(255, 255, 255, 0.2);
+
+  /* Typography colors */
+  --prism-text: #F4F7FF;
+  --prism-text-muted: #9AA6C4;
+  --prism-text-dim: #6E7A96;
+
+  /* Prism violet-to-cyan accents & dynamic backdrop palette */
+  --prism-accent-1: #7C5CFF;
+  --prism-accent-2: #00D4FF;
+  --prism-dynamic-1: var(--prism-accent-1);
+  --prism-dynamic-2: var(--prism-accent-2);
+  --prism-dynamic-rgb: 124, 92, 255;
+  --prism-dynamic-2-rgb: 0, 212, 255;
+  --prism-gradient: linear-gradient(135deg, var(--prism-dynamic-1) 0%, var(--prism-dynamic-2) 100%);
+  --prism-gradient-h: linear-gradient(90deg, var(--prism-dynamic-1) 0%, var(--prism-dynamic-2) 100%);
+
+  /* Radii & motion */
+  --prism-radius-sm: 8px;
+  --prism-radius-md: 14px;
+  --prism-radius-lg: 18px;
+  --prism-radius-pill: 9999px;
+  --prism-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* 10-foot focus halo & zero-blur ambient radial glow */
+  --prism-focus-ring: var(--prism-dynamic-2);
+  --prism-focus-glow: rgba(var(--prism-dynamic-rgb), 0.5);
+  --prism-ambient-glow: radial-gradient(
+    ellipse 65% 45% at 75% 0%,
+    rgba(var(--prism-dynamic-rgb), 0.24) 0%,
+    rgba(var(--prism-dynamic-2-rgb), 0.11) 42%,
+    rgba(0, 0, 0, 0) 75%
+  );
+
+  /* Glass blur & layout sizing */
+  --prism-blur: blur(18px);
+  --prism-header-height: 4.25rem;
+  --prism-header-offset: 64px;
+  --prism-gutter: clamp(1rem, 2.5vw, 2.5rem);
+}

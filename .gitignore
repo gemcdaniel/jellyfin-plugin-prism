@@ -1,0 +1,47 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+
+# .NET build, restore & test artifacts
+bin/
+obj/
+plugin/**/bin/
+plugin/**/obj/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+packages/
+artifacts/
+
+# Release staging & archives (dist/ and plugin/Jellyfin.Plugin.Prism/Web/ remain tracked)
+release/
+*.zip
+*.nupkg
+*.snupkg
+
+# Editors & IDEs
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*~
+
+# Local environment overrides
+.env
+.env.local
+.env.*.local

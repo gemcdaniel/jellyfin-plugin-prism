@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Prism</title>
+</head>
+<body>
+  <div id="PrismConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+    <div data-role="content">
+      <div class="content-primary">
+        <form id="PrismConfigForm">
+          <div class="sectionTitleContainer flex align-items-center">
+            <h2 class="sectionTitle">Prism Settings</h2>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnablePlugin" type="checkbox" is="emby-checkbox" />
+              <span>Enable Prism Plugin</span>
+            </label>
+            <div class="fieldDescription">Master toggle for CSS injection, TV Guide scroll fix, and dynamic Home sections.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableThemeCss" type="checkbox" is="emby-checkbox" />
+              <span>Inject Prism Theme CSS Automatically</span>
+            </label>
+            <div class="fieldDescription">Serves the bundled Prism stylesheet globally without needing Custom CSS pasting.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="ThemeDashboard" type="checkbox" is="emby-checkbox" />
+              <span>Apply Modern Prism Styling to Admin Dashboard</span>
+            </label>
+            <div class="fieldDescription">Styles React MUI forms, selects, and sidebar inside /dashboard/* pages.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableDesktopHamburger" type="checkbox" is="emby-checkbox" />
+              <span>Move Desktop Top Navigation Behind Hamburger Menu</span>
+            </label>
+            <div class="fieldDescription">Replaces inline desktop header tabs with a clean slide-out drawer button for an unobstructed full-bleed Hero.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableTvGuideScrollFix" type="checkbox" is="emby-checkbox" />
+              <span>Enable TV Guide Vertical Scroll Fix</span>
+            </label>
+            <div class="fieldDescription">Fixes D-pad Down/Up navigation scrolling in the Live TV Guide on LG WebOS and TV browsers.</div>
+          </div>
+
+          <div class="sectionTitleContainer flex align-items-center" style="margin-top: 1.5rem;">
+            <h2 class="sectionTitle">Home Screen Discovery &amp; Seasonal Rows</h2>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableHeroSpotlight" type="checkbox" is="emby-checkbox" />
+              <span>Enable Rotating Hero Spotlight Banner</span>
+            </label>
+            <div class="fieldDescription">Displays a lightweight OLED-vignetted featured carousel at the top of Home.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableDetailBackdrop" type="checkbox" is="emby-checkbox" />
+              <span>Full-Bleed Fading Detail Backdrop</span>
+            </label>
+            <div class="fieldDescription">Extends movie and show backdrops up behind the header and fades them smoothly down the details page.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableDynamicAmbientColor" type="checkbox" is="emby-checkbox" />
+              <span>Dynamic Ambient Color Extraction</span>
+            </label>
+            <div class="fieldDescription">Adapts accent highlights, glows, and header borders to match the active Hero or Detail artwork.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableMediaBadges" type="checkbox" is="emby-checkbox" />
+              <span>Subtle Media Quality Badges (4K, DV, HDR, Atmos)</span>
+            </label>
+            <div class="fieldDescription">Displays compact, non-intrusive format badges on 4K, Dolby Vision, HDR, and spatial audio cards.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableHomeSections" type="checkbox" is="emby-checkbox" />
+              <span>Enable Dynamic Curated Home Rows</span>
+            </label>
+            <div class="fieldDescription">Adds server-cached curated categories directly to the Home screen.</div>
+          </div>
+
+          <div class="checkboxContainer">
+            <label class="emby-checkbox-label">
+              <input id="EnableHolidayRow" type="checkbox" is="emby-checkbox" />
+              <span>Seasonal &amp; Upcoming Holiday Picks</span>
+            </label>
+          </div>
+
+          <div class="checkboxContainer">
+            <label class="emby-checkbox-label">
+              <input id="Enable4kShowcase" type="checkbox" is="emby-checkbox" />
+              <span>4K &amp; HDR Showcase</span>
+            </label>
+          </div>
+
+          <div class="checkboxContainer">
+            <label class="emby-checkbox-label">
+              <input id="EnableCriticallyAcclaimed" type="checkbox" is="emby-checkbox" />
+              <span>Critically Acclaimed</span>
+            </label>
+          </div>
+
+          <div class="checkboxContainer">
+            <label class="emby-checkbox-label">
+              <input id="EnableQuickWatches" type="checkbox" is="emby-checkbox" />
+              <span>Quick Watches (Under 100 Minutes)</span>
+            </label>
+          </div>
+
+          <div class="checkboxContainer">
+            <label class="emby-checkbox-label">
+              <input id="EnableSpotlightGenre" type="checkbox" is="emby-checkbox" />
+              <span>Daily Rotating Spotlight Genre</span>
+            </label>
+          </div>
+
+          <div class="inputContainer" style="margin-top: 1rem;">
+            <label class="inputLabel inputLabelUnfocused" for="MaxItemsPerRow">Max Items Per Row</label>
+            <input id="MaxItemsPerRow" type="number" min="4" max="40" is="emby-input" />
+            <div class="fieldDescription">Number of items returned per curated row (4–40).</div>
+          </div>
+
+          <div class="sectionTitleContainer flex align-items-center" style="margin-top: 1.5rem;">
+            <h2 class="sectionTitle">Discovery, New Releases, Watchlist &amp; TMDB</h2>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableInfiniteDiscovery" type="checkbox" is="emby-checkbox" />
+              <span>Enable Hybrid Infinite Discovery Feed</span>
+            </label>
+            <div class="fieldDescription">Loads personalized discovery rows &amp; inline spotlights below Home (scroll auto-load on Desktop/Mobile, focusable Discover More button on TV).</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableWatchlist" type="checkbox" is="emby-checkbox" />
+              <span>Enable Native Watchlist Integration</span>
+            </label>
+            <div class="fieldDescription">Adds Watchlist quick-toggle buttons synced to Jellyfin UserData.Likes, a Home Watchlist row, and automatic removal when watched.</div>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="EnableLibraryInfiniteScroll" type="checkbox" is="emby-checkbox" />
+              <span>Enable Library Infinite Scroll (Movies &amp; TV)</span>
+            </label>
+            <div class="fieldDescription">Appends 100-item batches seamlessly on Movies &amp; TV library views (focusable Load More button on TV).</div>
+          </div>
+
+          <div class="inputContainer" style="margin-top: 1rem;">
+            <label class="inputLabel inputLabelUnfocused" for="NewReleasesDays">New Release Movies Window (Days)</label>
+            <input id="NewReleasesDays" type="number" min="7" max="180" is="emby-input" />
+            <div class="fieldDescription">Include movies premiered within the last N days (7–180).</div>
+          </div>
+
+          <div class="inputContainer">
+            <label class="inputLabel inputLabelUnfocused" for="NewReleasesEpisodesDays">Recently Aired Episodes Window (Days)</label>
+            <input id="NewReleasesEpisodesDays" type="number" min="3" max="60" is="emby-input" />
+            <div class="fieldDescription">Include episodes aired within the last N days (3–60).</div>
+          </div>
+
+          <div class="inputContainer">
+            <label class="inputLabel inputLabelUnfocused" for="TmdbApiKey">TMDB API Key or Read Access Token (Optional)</label>
+            <input id="TmdbApiKey" type="password" autocomplete="off" is="emby-input" />
+            <div class="fieldDescription">Supports both TMDB v3 API keys and v4 Bearer tokens. Polled in the background for Trending, Popular, Holiday, and Thematic matches.</div>
+          </div>
+
+          <div class="sectionTitleContainer flex align-items-center" style="margin-top: 1.5rem;">
+            <h2 class="sectionTitle">Native Collections Sync (For Android TV)</h2>
+          </div>
+
+          <div class="checkboxContainer checkboxContainer-withDescription">
+            <label class="emby-checkbox-label">
+              <input id="SyncHolidayCollection" type="checkbox" is="emby-checkbox" />
+              <span>Sync Active Holiday Picks to a Native Jellyfin Collection</span>
+            </label>
+            <div class="fieldDescription">Updates a native Collection daily (via Scheduled Task) so Android TV and native apps also surface seasonal picks.</div>
+          </div>
+
+          <div class="inputContainer">
+            <label class="inputLabel inputLabelUnfocused" for="HolidayCollectionName">Holiday Collection Name</label>
+            <input id="HolidayCollectionName" type="text" is="emby-input" />
+          </div>
+
+          <div style="margin-top: 1.5rem;">
+            <button is="emby-button" type="submit" class="raised button-submit block">
+              <span>Save</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      (function () {
+        var pluginId = 'd8a4b2e1-7c3f-4e92-9b14-6f2c8d5a1e03';
+        var fields = [
+          'EnablePlugin',
+          'EnableThemeCss',
+          'ThemeDashboard',
+          'EnableDesktopHamburger',
+          'EnableTvGuideScrollFix',
+          'EnableHeroSpotlight',
+          'EnableDetailBackdrop',
+          'EnableDynamicAmbientColor',
+          'EnableMediaBadges',
+          'EnableHomeSections',
+          'EnableHolidayRow',
+          'Enable4kShowcase',
+          'EnableCriticallyAcclaimed',
+          'EnableQuickWatches',
+          'EnableSpotlightGenre',
+          'EnableInfiniteDiscovery',
+          'EnableWatchlist',
+          'EnableLibraryInfiniteScroll',
+          'SyncHolidayCollection'
+        ];
+
+        document.querySelector('#PrismConfigPage').addEventListener('pageshow', function () {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+            fields.forEach(function (id) {
+              document.getElementById(id).checked = Boolean(config[id]);
+            });
+            document.getElementById('MaxItemsPerRow').value = config.MaxItemsPerRow || 16;
+            document.getElementById('NewReleasesDays').value = config.NewReleasesDays || 45;
+            document.getElementById('NewReleasesEpisodesDays').value = config.NewReleasesEpisodesDays || 14;
+            document.getElementById('TmdbApiKey').value = config.TmdbApiKey || '';
+            document.getElementById('HolidayCollectionName').value = config.HolidayCollectionName || 'Seasonal & Holiday Picks';
+            Dashboard.hideLoadingMsg();
+          });
+        });
+
+        document.querySelector('#PrismConfigForm').addEventListener('submit', function (e) {
+          e.preventDefault();
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+            fields.forEach(function (id) {
+              config[id] = document.getElementById(id).checked;
+            });
+            config.MaxItemsPerRow = parseInt(document.getElementById('MaxItemsPerRow').value, 10) || 16;
+            config.NewReleasesDays = parseInt(document.getElementById('NewReleasesDays').value, 10) || 45;
+            config.NewReleasesEpisodesDays = parseInt(document.getElementById('NewReleasesEpisodesDays').value, 10) || 14;
+            config.TmdbApiKey = (document.getElementById('TmdbApiKey').value || '').trim();
+            config.HolidayCollectionName = document.getElementById('HolidayCollectionName').value || 'Seasonal & Holiday Picks';
+
+            ApiClient.updatePluginConfiguration(pluginId, config).then(function (result) {
+              Dashboard.processPluginConfigurationUpdateResult(result);
+            });
+          });
+          return false;
+        });
+      })();
+    </script>
+  </div>
+</body>
+</html>

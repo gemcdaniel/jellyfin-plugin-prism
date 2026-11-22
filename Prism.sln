@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugin", "plugin", "{7F42074E-682A-A599-6CDB-8399CB51B8EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.Plugin.Prism", "plugin\Jellyfin.Plugin.Prism\Jellyfin.Plugin.Prism.csproj", "{B018AA61-E413-4766-9D53-D6491007D815}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.Plugin.Prism.Tests", "plugin\Jellyfin.Plugin.Prism.Tests\Jellyfin.Plugin.Prism.Tests.csproj", "{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B018AA61-E413-4766-9D53-D6491007D815}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Debug|x64.Build.0 = Debug|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Debug|x86.Build.0 = Debug|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Release|x64.ActiveCfg = Release|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Release|x64.Build.0 = Release|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Release|x86.ActiveCfg = Release|Any CPU
+		{B018AA61-E413-4766-9D53-D6491007D815}.Release|x86.Build.0 = Release|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Debug|x64.Build.0 = Debug|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Debug|x86.Build.0 = Debug|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Release|x64.ActiveCfg = Release|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Release|x64.Build.0 = Release|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Release|x86.ActiveCfg = Release|Any CPU
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B018AA61-E413-4766-9D53-D6491007D815} = {7F42074E-682A-A599-6CDB-8399CB51B8EF}
+		{DAC3B3C1-4E64-4A7F-860E-5D33180230BE} = {7F42074E-682A-A599-6CDB-8399CB51B8EF}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,51 @@
+name: Bug Report
+description: Report a visual, layout, TV navigation, or plugin issue in Prism
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting an issue! Please include your Jellyfin version and client environment below.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected to see.
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: Client Platform
+      options:
+        - Desktop Web Browser
+        - Android Mobile App (.layout-mobile)
+        - LG WebOS TV (.layout-tv)
+        - Other TV Browser
+        - Admin Dashboard
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Prism & Jellyfin Version
+      placeholder: "e.g. Prism v1.0.0 / Jellyfin 12.4.0"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Navigate to '...'
+        2. Scroll or click '...'
+        3. Observe '...'
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Browser Console / Jellyfin Server Logs
+      description: Any relevant console errors or server log snippets.
+      render: text

@@ -1,0 +1,411 @@
+/* ==========================================================================
+   Prism — Hero Spotlight & Inline Discovery Banners
+   Targets community Jellyfin Media Bar DOM selectors cleanly across Viewports.
+   ========================================================================== */
+
+#slides-container {
+  position: relative;
+  width: 100%;
+  height: clamp(360px, 58vh, 620px);
+  background-color: var(--prism-bg);
+  overflow: hidden;
+  border-bottom: none !important;
+}
+
+#slides-container[data-prism-injected="true"] {
+  margin-top: calc(-1 * var(--prism-hero-pull, var(--prism-header-offset, 64px)));
+  height: clamp(440px, 66vh, 690px);
+}
+
+#slides-container .slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 4.5rem var(--prism-gutter) 2.25rem;
+  box-sizing: border-box;
+}
+
+#slides-container[data-prism-injected="true"] .slide {
+  padding-top: calc(var(--prism-header-offset, 64px) + 2.5rem);
+}
+
+#slides-container .backdrop-container,
+#slides-container .backdrop,
+#slides-container .prism-backdrop-layer,
+.prism-inline-spotlight .prism-backdrop-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  z-index: 0;
+}
+
+.prism-backdrop-layer {
+  opacity: 0;
+  transition: opacity 650ms var(--prism-ease);
+  will-change: opacity, transform;
+}
+
+.prism-backdrop-layer.is-active {
+  opacity: 1;
+}
+
+@keyframes prismKenBurns {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.06) translate3d(-1.2%, -0.8%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.layout-tv) #slides-container .prism-backdrop-layer.prism-kb-active {
+    animation: prismKenBurns 11s ease-out forwards;
+  }
+}
+
+.prism-hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.prism-hero-reason {
+  display: inline-block;
+  margin-bottom: 0.55rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: var(--prism-radius-pill);
+  background: rgba(var(--prism-dynamic-rgb), 0.24);
+  border: 1px solid rgba(var(--prism-dynamic-2-rgb), 0.45);
+  color: var(--prism-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.prism-hero-logo {
+  max-width: min(360px, 60vw);
+  max-height: 112px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: left bottom;
+  display: block;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.78));
+}
+
+.prism-hero-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.4vw, 2.65rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--prism-text);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.88);
+}
+
+/* Smooth OLED vignette melt — leaves center/top/right artwork crisp and vivid */
+#slides-container .backdrop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 55% at 78% 18%, rgba(var(--prism-dynamic-rgb), 0.14) 0%, rgba(0, 0, 0, 0) 68%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.24) 28%, rgba(0, 0, 0, 0) 54%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, 0.52) 85%, var(--prism-bg) 100%);
+}
+
+#slides-container .logo-container,
+#slides-container .info-container,
+#slides-container .plot-container,
+#slides-container .button-container,
+.prism-inline-spotlight .logo-container,
+.prism-inline-spotlight .info-container,
+.prism-inline-spotlight .plot-container,
+.prism-inline-spotlight .button-container {
+  position: relative;
+  z-index: 2;
+}
+
+#slides-container .logo-container,
+.prism-inline-spotlight .logo-container {
+  max-width: min(360px, 60vw);
+  margin-bottom: 0.65rem;
+}
+
+#slides-container .info-container,
+.prism-inline-spotlight .info-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--prism-text-muted);
+  font-size: 0.88rem;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.88);
+}
+
+#slides-container .genre-container,
+#slides-container .rating-container,
+.prism-inline-spotlight .genre-container {
+  background-color: rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--prism-border);
+  border-radius: var(--prism-radius-sm);
+  padding: 0.18rem 0.55rem;
+  color: var(--prism-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+#slides-container .plot-container,
+.prism-inline-spotlight .plot-container {
+  color: var(--prism-text-muted);
+  max-width: 54ch;
+  line-height: 1.5;
+  font-size: 0.94rem;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.88);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#slides-container .button-container,
+.prism-inline-spotlight .button-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+#slides-container .play-button,
+.prism-inline-spotlight .play-button {
+  background: var(--prism-gradient) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: var(--prism-radius-pill) !important;
+  padding: 0.65rem 1.45rem !important;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(124, 92, 255, 0.42);
+  transition: transform 160ms var(--prism-ease), box-shadow 160ms var(--prism-ease);
+}
+
+#slides-container .play-button:hover,
+.prism-inline-spotlight .play-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 212, 255, 0.45);
+}
+
+#slides-container .detail-button,
+.prism-inline-spotlight .detail-button {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--prism-text) !important;
+  border: 1px solid var(--prism-border-strong) !important;
+  border-radius: var(--prism-radius-pill) !important;
+  padding: 0.65rem 1.35rem !important;
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 160ms var(--prism-ease), border-color 160ms var(--prism-ease);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  #slides-container .detail-button,
+  .prism-inline-spotlight .detail-button {
+    -webkit-backdrop-filter: var(--prism-blur);
+    backdrop-filter: var(--prism-blur);
+  }
+}
+
+#slides-container .detail-button:hover,
+.prism-inline-spotlight .detail-button:hover {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.prism-watchlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.prism-watchlist-btn.is-active {
+  background: linear-gradient(135deg, rgba(124, 92, 255, 0.34), rgba(0, 212, 255, 0.24)) !important;
+  border-color: rgba(0, 212, 255, 0.55) !important;
+  color: #FFFFFF !important;
+}
+
+/* Pagination Dots & Arrow Buttons */
+#slides-container .hero-controls-right,
+.prism-inline-spotlight .hero-controls-right {
+  position: absolute;
+  right: var(--prism-gutter);
+  bottom: 2.25rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+#slides-container .dots-container,
+.prism-inline-spotlight .dots-container {
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+#slides-container .dot,
+.prism-inline-spotlight .dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--prism-radius-pill);
+  background-color: rgba(255, 255, 255, 0.35);
+  border: none;
+  cursor: pointer;
+  transition: width 200ms var(--prism-ease), background-color 200ms var(--prism-ease);
+}
+
+#slides-container .dot.active,
+.prism-inline-spotlight .dot.active {
+  width: 1.6rem;
+  background: var(--prism-gradient-h) !important;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.55);
+}
+
+#slides-container .arrow-button,
+.prism-inline-spotlight .arrow-button {
+  z-index: 3;
+  background-color: rgba(10, 12, 18, 0.68) !important;
+  color: var(--prism-text) !important;
+  border: 1px solid var(--prism-border) !important;
+  border-radius: var(--prism-radius-pill) !important;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Inline Discovery Spotlight Banner */
+.prism-inline-spotlight-stage {
+  position: relative;
+  margin-inline: var(--prism-gutter);
+  min-height: clamp(280px, 42vh, 430px);
+  border-radius: var(--prism-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--prism-border);
+  background-color: var(--prism-bg-elevated);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2.25rem clamp(1.25rem, 3vw, 2.5rem);
+  box-sizing: border-box;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.72);
+}
+
+.prism-inline-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 55% at 80% 15%, rgba(var(--prism-dynamic-rgb), 0.14) 0%, rgba(0, 0, 0, 0) 68%),
+    linear-gradient(90deg, rgba(4, 6, 12, 0.72) 0%, rgba(4, 6, 12, 0.32) 34%, rgba(4, 6, 12, 0) 60%),
+    linear-gradient(180deg, rgba(4, 6, 12, 0.04) 0%, rgba(4, 6, 12, 0) 35%, rgba(4, 6, 12, 0.42) 66%, rgba(4, 6, 12, 0.88) 100%);
+}
+
+.prism-inline-content {
+  position: relative;
+  z-index: 2;
+  max-width: 58ch;
+}
+
+.prism-inline-spotlight .prism-hero-title {
+  font-size: clamp(1.35rem, 2.5vw, 2.1rem);
+}
+
+.prism-inline-spotlight .prism-hero-logo {
+  max-height: 82px;
+  max-width: min(290px, 55vw);
+}
+
+.prism-inline-spotlight .plot-container {
+  -webkit-line-clamp: 2;
+  font-size: 0.9rem;
+  margin: 0.6rem 0 0;
+}
+
+.prism-inline-spotlight .hero-controls-right {
+  right: 1.5rem;
+  bottom: 1.5rem;
+}
+
+/* 10-Foot TV Adaptations for Media Bar */
+.layout-tv #slides-container {
+  height: 54vh;
+  min-height: 410px;
+}
+
+.layout-tv #slides-container[data-prism-injected="true"] {
+  height: 60vh;
+  min-height: 450px;
+}
+
+.layout-tv #slides-container .play-button:focus,
+.layout-tv #slides-container .detail-button:focus,
+.layout-tv #slides-container .dot:focus,
+.layout-tv #slides-container .arrow-button:focus {
+  outline: none !important;
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2.5px var(--prism-focus-ring), 0 0 22px var(--prism-focus-glow) !important;
+}
+
+.layout-tv #slides-container .detail-button,
+.layout-tv #slides-container .arrow-button {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background-color: rgba(14, 18, 30, 0.9) !important;
+}
+
+/* Mobile Adaptations for Media Bar (Keep Continue Watching peeking above fold) */
+.layout-mobile #slides-container {
+  height: clamp(320px, 48vh, 390px);
+}
+
+.layout-mobile #slides-container[data-prism-injected="true"] {
+  height: clamp(360px, 54vh, 430px);
+}
+
+@media (max-width: 640px) {
+  #slides-container {
+    height: clamp(320px, 48vh, 390px);
+  }
+}
+
+.layout-mobile #slides-container .plot-container {
+  -webkit-line-clamp: 2;
+  font-size: 0.85rem;
+}
+
+.layout-mobile #slides-container .arrow-button {
+  display: none;
+}
+
+.layout-mobile #slides-container .button-container {
+  width: 100%;
+}
+
+.layout-mobile #slides-container .play-button {
+  flex: 1 1 auto;
+  text-align: center;
+}

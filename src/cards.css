@@ -1,0 +1,642 @@
+/* ==========================================================================
+   Prism — Section Headers, Media Cards & Progress Indicators
+   ========================================================================== */
+
+.homeSectionsContainer {
+  padding-top: 0.35rem;
+  padding-bottom: 2rem;
+}
+
+.verticalSection {
+  margin-bottom: 0.65rem !important;
+}
+
+.sectionTitleContainer {
+  padding-inline: var(--prism-gutter);
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.15rem !important;
+  margin-bottom: 0.3rem !important;
+  display: flex;
+  align-items: center;
+}
+
+.sectionTitle {
+  color: var(--prism-text) !important;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.sectionTitleTextButton {
+  color: var(--prism-text) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sectionTitleTextButton:hover {
+  color: var(--prism-accent-2) !important;
+}
+
+/* Card Containers */
+.card {
+  padding: 0.22rem !important;
+}
+
+.cardBox {
+  background-color: var(--prism-bg-elevated) !important;
+  border-radius: var(--prism-radius-md) !important;
+  border: 1px solid var(--prism-border);
+  overflow: hidden;
+  transition: transform 180ms var(--prism-ease), border-color 180ms var(--prism-ease), box-shadow 180ms var(--prism-ease);
+}
+
+.cardBox-bottompadded {
+  margin: 0.2rem 0.22rem 0.45rem !important;
+}
+
+.cardScalable {
+  border-radius: var(--prism-radius-md) var(--prism-radius-md) 0 0;
+  background-color: var(--prism-bg-elevated);
+  overflow: hidden;
+}
+
+.cardContent > .cardImageContainer,
+.cardScalable > .cardImageContainer {
+  border-radius: var(--prism-radius-md) var(--prism-radius-md) 0 0;
+  background-color: var(--prism-bg-elevated);
+  overflow: hidden;
+  transition: transform 220ms var(--prism-ease);
+}
+
+/* Keep React's dynamically mounted hover link inside .cardOverlayContainer completely transparent */
+.cardOverlayContainer .cardImageContainer,
+.cardOverlayContainer a.cardImageContainer {
+  background-color: transparent !important;
+  transform: none !important;
+}
+
+/* Hover Overlay & Primary Play Button (replaces flat dark box with luminous scrim) */
+.cardOverlayContainer {
+  background: linear-gradient(
+    180deg,
+    rgba(124, 92, 255, 0.08) 0%,
+    rgba(0, 0, 0, 0.06) 52%,
+    rgba(0, 0, 0, 0.72) 100%
+  ) !important;
+  border-radius: inherit;
+  transition: opacity 180ms var(--prism-ease);
+}
+
+.cardOverlayFab-primary {
+  background: var(--prism-gradient) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 8px 24px rgba(124, 92, 255, 0.55), 0 0 18px rgba(0, 212, 255, 0.3);
+  transition: transform 180ms var(--prism-ease), box-shadow 180ms var(--prism-ease);
+}
+
+.cardOverlayFab-primary:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 28px rgba(124, 92, 255, 0.65), 0 0 22px rgba(0, 212, 255, 0.45);
+}
+
+/* Center overlay play button cleanly inside dynamically injected plugin cards */
+.prism-home-section .cardOverlayFab-primary {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  margin: 0 !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.prism-home-section .cardOverlayFab-primary:hover {
+  transform: translate(-50%, -50%) scale(1.08) !important;
+}
+
+.cardOverlayButton {
+  color: var(--prism-text) !important;
+  border-radius: var(--prism-radius-pill) !important;
+  transition: color 160ms var(--prism-ease), background-color 160ms var(--prism-ease);
+}
+
+.cardOverlayButton:hover {
+  color: var(--prism-accent-2) !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Desktop hover lift & Prism rim highlight (scoped to pointer devices) */
+@media (hover: hover) {
+  .card:hover .cardBox {
+    transform: translateY(-3px);
+    border-color: rgba(var(--prism-dynamic-2-rgb), 0.52);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8), 0 0 18px rgba(var(--prism-dynamic-rgb), 0.28);
+  }
+
+  .card:hover .cardContent > .cardImageContainer,
+  .card:hover .cardScalable > .cardImageContainer {
+    transform: scale(1.03);
+  }
+}
+
+/* Continue Watching Progress Bar */
+.itemProgressBar {
+  height: 4px !important;
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+.itemProgressBarForeground {
+  background: var(--prism-gradient-h) !important;
+  border-radius: var(--prism-radius-pill);
+}
+
+/* Played Checkmark & Unwatched Count Pills */
+.cardIndicators {
+  top: 0.5rem;
+  right: 0.5rem;
+  gap: 0.3rem;
+}
+
+.playedIndicator,
+.countIndicator {
+  background: var(--prism-gradient) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--prism-radius-pill) !important;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+}
+
+/* Subtle Non-Intrusive Media Quality Badges (Top-Left of Card) */
+.prism-card-badges {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  z-index: 3;
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.25rem;
+  pointer-events: none;
+}
+
+.prism-badge {
+  background-color: rgba(8, 10, 16, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #F4F7FF;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.prism-badge--4k {
+  color: #F4F7FF;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.prism-badge--dv {
+  color: #D8C8FF;
+  border-color: rgba(124, 92, 255, 0.48);
+}
+
+.prism-badge--hdr {
+  color: #FCD34D;
+  border-color: rgba(245, 166, 35, 0.42);
+}
+
+.prism-badge--audio {
+  color: #7DD3FC;
+  border-color: rgba(0, 212, 255, 0.42);
+}
+
+/* Card Text Footer */
+.cardFooter {
+  padding: 0.4rem 0.55rem 0.48rem !important;
+  background-color: var(--prism-bg-elevated);
+}
+
+.cardText {
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardText-first {
+  color: var(--prism-text) !important;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.cardText-secondary {
+  color: var(--prism-text-muted) !important;
+  font-size: 0.76rem;
+  margin-top: 0.1rem;
+  line-height: 1.3;
+}
+
+/* Scroller Padding (extra vertical/inline room so hover glow isn't clipped) */
+.emby-scroller,
+.prism-scroller {
+  padding-inline: var(--prism-gutter);
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+/* Hide horizontal scrollbars on injected rows to match native Jellyfin carousels */
+.prism-scroller {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.prism-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.prism-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.prism-scroll-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.prism-scroll-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--prism-text-muted);
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--prism-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: color 150ms var(--prism-ease), background-color 150ms var(--prism-ease), border-color 150ms var(--prism-ease);
+}
+
+.prism-scroll-btn:hover {
+  color: var(--prism-text);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--prism-border);
+}
+
+/* Media-Dense Desktop Card Sizing (.layout-desktop only; TV & Mobile keep own rules) */
+@media (min-width: 768px) {
+  .layout-desktop .overflowPortraitCard {
+    width: 178px !important;
+    box-sizing: border-box !important;
+  }
+
+  .layout-desktop .overflowBackdropCard {
+    width: 276px !important;
+    box-sizing: border-box !important;
+  }
+
+  .layout-desktop .section0 .overflowBackdropCard,
+  .layout-desktop .smallBackdropCard {
+    width: 224px !important;
+    box-sizing: border-box !important;
+  }
+
+  .layout-desktop .itemsContainer.vertical-wrap .portraitCard {
+    width: 20% !important;
+    box-sizing: border-box !important;
+  }
+
+  .layout-desktop .itemsContainer.vertical-wrap .backdropCard {
+    width: 33.333% !important;
+    box-sizing: border-box !important;
+  }
+
+  .layout-desktop .itemsContainer.vertical-wrap .squareCard {
+    width: 20% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .layout-desktop .itemsContainer.vertical-wrap .portraitCard {
+    width: 14.285% !important;
+  }
+
+  .layout-desktop .itemsContainer.vertical-wrap .backdropCard {
+    width: 25% !important;
+  }
+
+  .layout-desktop .itemsContainer.vertical-wrap .squareCard {
+    width: 16.666% !important;
+  }
+}
+
+@media (min-width: 1600px) {
+  .layout-desktop .itemsContainer.vertical-wrap .portraitCard {
+    width: 11.111% !important;
+  }
+
+  .layout-desktop .itemsContainer.vertical-wrap .backdropCard {
+    width: 20% !important;
+  }
+
+  .layout-desktop .itemsContainer.vertical-wrap .squareCard {
+    width: 12.5% !important;
+  }
+}
+
+/* Content-visibility rendering optimization for off-screen Home rows (Desktop/Mobile only) */
+@supports (content-visibility: auto) {
+  html:not(.layout-tv) .prism-home-section {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 320px;
+  }
+}
+
+.prism-section-pill {
+  margin-left: 0.65rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  background: rgba(124, 92, 255, 0.24);
+  border: 1px solid rgba(0, 212, 255, 0.38);
+  color: #F4F7FF;
+}
+
+.layout-desktop .prism-card-thumb {
+  width: 276px !important;
+}
+
+/* Quick Watchlist Bookmark Toggle on Prism Cards */
+.prism-card-wl-btn {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  z-index: 4;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(8, 10, 16, 0.78);
+  color: #F4F7FF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms var(--prism-ease), transform 150ms var(--prism-ease), background-color 150ms var(--prism-ease), border-color 150ms var(--prism-ease);
+}
+
+.card:hover .prism-card-wl-btn,
+.card:focus-within .prism-card-wl-btn,
+.prism-card-wl-btn.is-active {
+  opacity: 1;
+}
+
+.prism-card-wl-btn.is-active {
+  background: var(--prism-gradient);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+@media (hover: none) {
+  .prism-card-wl-btn {
+    opacity: 1;
+  }
+}
+
+/* Thematic Picks Tile Strip */
+.prism-theme-tile {
+  position: relative;
+  flex: 0 0 auto;
+  width: 276px;
+  aspect-ratio: 16 / 9;
+  margin: 0.2rem 0.44rem 0.45rem 0.22rem;
+  border-radius: var(--prism-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--prism-border);
+  border-bottom: 2px solid var(--prism-tile-accent, var(--prism-accent-1));
+  background-color: var(--prism-bg-elevated);
+  cursor: pointer;
+  transition: transform 180ms var(--prism-ease), border-color 180ms var(--prism-ease), box-shadow 180ms var(--prism-ease);
+}
+
+.prism-theme-tile-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 240ms var(--prism-ease);
+}
+
+.prism-theme-tile-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.62) 55%, rgba(0, 0, 0, 0.92) 100%);
+}
+
+.prism-theme-tile-body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0.85rem 0.95rem;
+}
+
+.prism-theme-tile-group {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--prism-tile-accent, var(--prism-accent-2));
+  margin-bottom: 0.15rem;
+}
+
+.prism-theme-tile-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--prism-text);
+  line-height: 1.2;
+}
+
+.prism-theme-tile-count {
+  font-size: 0.72rem;
+  color: var(--prism-text-muted);
+  margin-top: 0.2rem;
+}
+
+@media (hover: hover) {
+  .prism-theme-tile:hover {
+    transform: translateY(-3px);
+    border-color: var(--prism-tile-accent, var(--prism-accent-2));
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8), 0 0 18px rgba(var(--prism-dynamic-rgb), 0.24);
+  }
+
+  .prism-theme-tile:hover .prism-theme-tile-bg {
+    transform: scale(1.04);
+  }
+}
+
+/* Thematic Picks Modal Dialog */
+.prism-theme-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  box-sizing: border-box;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .prism-theme-modal-backdrop {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+.prism-theme-modal {
+  width: min(1080px, 100%);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 13, 22, 0.96);
+  border: 1px solid var(--prism-border-strong);
+  border-radius: var(--prism-radius-lg);
+  overflow: hidden;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.9);
+}
+
+.prism-theme-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.35rem;
+  border-bottom: 1px solid var(--prism-border);
+}
+
+.prism-theme-modal-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--prism-accent-2);
+  margin-bottom: 0.2rem;
+}
+
+.prism-theme-modal-title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--prism-text);
+}
+
+.prism-theme-modal-subtitle {
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
+  color: var(--prism-text-muted);
+}
+
+.prism-theme-modal-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--prism-border);
+  color: var(--prism-text);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--prism-radius-pill);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.prism-theme-modal-body {
+  padding: 1.15rem 1.35rem;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.prism-theme-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(154px, 1fr));
+  gap: 0.55rem;
+}
+
+.prism-theme-modal-grid .card {
+  width: 100% !important;
+}
+
+/* Discovery & Library Infinite Scroll Footer */
+.prism-discovery-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem var(--prism-gutter) 2rem;
+}
+
+.prism-discovery-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--prism-text-muted);
+  font-size: 0.88rem;
+}
+
+@keyframes prismSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.prism-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-top-color: var(--prism-accent-2);
+  animation: prismSpin 0.8s linear infinite;
+}
+
+.prism-load-more-btn {
+  background: var(--prism-surface-solid);
+  color: var(--prism-text);
+  border: 1px solid var(--prism-border-strong);
+  border-radius: var(--prism-radius-pill);
+  padding: 0.7rem 1.75rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 160ms var(--prism-ease), background-color 160ms var(--prism-ease), border-color 160ms var(--prism-ease);
+}
+
+.prism-load-more-btn:hover {
+  background: var(--prism-surface-hover);
+  border-color: var(--prism-accent-2);
+}
+
+.prism-discovery-end {
+  color: var(--prism-text-dim);
+  font-size: 0.82rem;
+}
+
+.prism-discovery-sentinel {
+  width: 100%;
+  height: 1px;
+}

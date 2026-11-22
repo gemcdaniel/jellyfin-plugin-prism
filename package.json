@@ -1,0 +1,19 @@
+{
+  "name": "jellyfin-plugin-prism",
+  "version": "1.0.0",
+  "description": "Prism — True-black OLED UI, ClearLogo spotlights, 3-day rotating discovery & holiday picks, thematic collections, native watchlist, library infinite scroll, and LG WebOS 60fps guardrails for Jellyfin 12.4+.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:plugin": "npm run build && dotnet build plugin/Jellyfin.Plugin.Prism/Jellyfin.Plugin.Prism.csproj -c Release",
+    "lint:js": "node scripts/lint.mjs",
+    "lint:dotnet": "dotnet format Prism.sln --verify-no-changes",
+    "lint": "npm run lint:js && npm run lint:dotnet",
+    "test:js": "node --test tests/frontend.test.mjs",
+    "test:dotnet": "dotnet test Prism.sln -c Release --verbosity normal",
+    "test": "npm run test:js && npm run test:dotnet",
+    "package:release": "node scripts/package-release.mjs"
+  },
+  "license": "MIT"
+}

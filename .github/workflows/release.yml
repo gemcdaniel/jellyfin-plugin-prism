@@ -1,0 +1,154 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semantic version to release (e.g. 1.0.0 or 1.1.0-rc.1)"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark GitHub Release as pre-release"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build, Test & Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Resolve and validate release version
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            RAW_VERSION="${{ inputs.version }}"
+          else
+            RAW_VERSION="${GITHUB_REF_NAME}"
+          fi
+
+          VERSION="${RAW_VERSION#v}"
+          if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Invalid semantic version '${RAW_VERSION}'. Expected vX.Y.Z or X.Y.Z."
+            exit 1
+          fi
+
+          ASSEMBLY_VERSION="${VERSION%%-*}"
+          TAG="v${VERSION}"
+
+          IS_PRERELEASE="false"
+          if [[ "${VERSION}" == *-* ]] || [[ "${{ inputs.prerelease }}" == "true" ]]; then
+            IS_PRERELEASE="true"
+          fi
+
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            CSPROJ_VERSION="$(sed -n 's/.*<Version>\([^<]*\)<\/Version>.*/\1/p' plugin/Jellyfin.Plugin.Prism/Jellyfin.Plugin.Prism.csproj | head -n 1 | tr -d '[:space:]')"
+            if [[ "${CSPROJ_VERSION}" != "${ASSEMBLY_VERSION}" ]]; then
+              echo "::error::Tag version (${ASSEMBLY_VERSION}) does not match <Version>${CSPROJ_VERSION}</Version> in Jellyfin.Plugin.Prism.csproj."
+              exit 1
+            fi
+          fi
+
+          {
+            echo "version=${VERSION}"
+            echo "assembly_version=${ASSEMBLY_VERSION}"
+            echo "tag=${TAG}"
+            echo "is_prerelease=${IS_PRERELEASE}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Build frontend CSS & JS bundles
+        run: npm run build
+
+      - name: Restore .NET dependencies
+        run: dotnet restore Prism.sln
+
+      - name: Run linters
+        run: npm run lint
+
+      - name: Build .NET solution (Release, warnings as errors)
+        run: dotnet build Prism.sln -c Release --no-restore -warnaserror -p:Version="${{ steps.meta.outputs.assembly_version }}" -p:InformationalVersion="${{ steps.meta.outputs.version }}"
+
+      - name: Run frontend unit tests
+        run: npm run test:js
+
+      - name: Run .NET xUnit tests
+        run: dotnet test Prism.sln -c Release --no-build --verbosity normal
+
+      - name: Package release artifacts
+        run: |
+          node scripts/package-release.mjs \
+            --version "${{ steps.meta.outputs.version }}" \
+            --repo "${{ github.repository }}" \
+            --out-dir release
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.meta.outputs.tag }}"
+          VERSION="${{ steps.meta.outputs.version }}"
+          IS_PRERELEASE="${{ steps.meta.outputs.is_prerelease }}"
+
+          ASSETS=(
+            "release/prism-plugin_v${VERSION}.zip"
+            "release/Jellyfin.Plugin.Prism.dll"
+            "release/prism.css"
+            "release/prism.min.css"
+            "release/checksums.txt"
+            "release/manifest-entry.json"
+          )
+
+          PRERELEASE_FLAG=()
+          if [[ "${IS_PRERELEASE}" == "true" ]]; then
+            PRERELEASE_FLAG+=(--prerelease)
+          fi
+
+          NOTES_BODY="$(cat release/RELEASE_NOTES.md)"
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" "${ASSETS[@]}" --clobber
+            gh release edit "${TAG}" \
+              --title "Prism ${TAG}" \
+              --notes "${NOTES_BODY}" \
+              "${PRERELEASE_FLAG[@]}"
+          else
+            TARGET_FLAGS=()
+            if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+              TARGET_FLAGS+=(--target "${{ github.sha }}")
+            fi
+            gh release create "${TAG}" "${ASSETS[@]}" \
+              --title "Prism ${TAG}" \
+              --notes "${NOTES_BODY}" \
+              --generate-notes \
+              "${PRERELEASE_FLAG[@]}" \
+              "${TARGET_FLAGS[@]}"
+          fi

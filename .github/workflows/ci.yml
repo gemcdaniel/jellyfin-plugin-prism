@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-lint-test:
+    name: Build, Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore .NET dependencies
+        run: dotnet restore Prism.sln
+
+      - name: Run linters (CSS, JS, workflows, dotnet format)
+        run: npm run lint
+
+      - name: Rebuild CSS & JS bundles and check git diff
+        run: |
+          npm run build
+          git diff --exit-code dist/ plugin/Jellyfin.Plugin.Prism/Web/
+
+      - name: Build .NET solution (Release, warnings as errors)
+        run: dotnet build Prism.sln -c Release --no-restore -warnaserror
+
+      - name: Run frontend unit tests
+        run: npm run test:js
+
+      - name: Run .NET xUnit tests
+        run: dotnet test Prism.sln -c Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload .NET test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: "**/TestResults/*.trx"
+          if-no-files-found: ignore
