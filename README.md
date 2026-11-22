@@ -23,8 +23,19 @@ It is designed around real living-room hardware constraints—including **LG Web
 
 ## Installation
 
-### Option 1: Prism Jellyfin Plugin (Recommended for Jellyfin 12.4+)
-The bundled `.NET 10` plugin ([`plugin/Jellyfin.Plugin.Prism`](./plugin/Jellyfin.Plugin.Prism)) unlocks:
+### Option 1: Official Jellyfin Plugin Repository (Recommended for Jellyfin 12.4+)
+Add the Prism plugin repository once so you can install and receive automatic updates directly from Jellyfin's **Plugin Catalog**:
+
+1. In Jellyfin, open **Dashboard → Plugins → Repositories → `+`** (Add).
+2. Set **Repository Name** to `Prism` and **Repository URL** to:
+   ```text
+   https://raw.githubusercontent.com/gemcdaniel/jellyfin-plugin-prism/main/manifest.json
+   ```
+3. Click **Save**, then open **Dashboard → Plugins → Catalog**.
+4. Select **Prism**, click **Install**, and **restart your Jellyfin server**.
+5. *(Recommended)* Clear any pasted CSS from **Dashboard → Branding → Custom CSS** so it isn't loaded twice, then configure toggles under **Dashboard → Plugins → Prism**.
+
+What the bundled `.NET 10` plugin ([`plugin/Jellyfin.Plugin.Prism`](./plugin/Jellyfin.Plugin.Prism)) unlocks:
 - **Upgraded Hero & Inline Discovery Spotlights**: Full-bleed OLED hero banner with **ClearLogo artwork** (with title fallback), **multi-backdrop cycling**, subtle Ken Burns motion on Desktop/Mobile (disabled on LG WebOS TV & `prefers-reduced-motion`), Watchlist quick-toggle, and **inline Discovery Spotlight banners** interspersed across the feed.
 - **New Releases & 3-Day Rotating Dynamic Sections**: **New Release Movies** and **Recently Aired Episodes** (deduplicated per series), **4K & HDR Showcase**, **Critically Acclaimed**, **Quick Watches (<100m)**, **Decade Flashbacks**, **Hidden Gems**, and **Rotating Spotlight Genres** — deterministically rotated every **3 days** so Home stays fresh without shifting on reloads.
 - **12-Window Holiday & Seasonal Picks (+ Seasonal TV Episodes)**: Calendar-aware holiday rows year-round (`New Year`, `Awards Season`, `Valentine's`, `St. Patrick's`, `Spring`, `May 4th Sci-Fi`, `Summer Blockbusters`, `Independence Day`, `Back to School`, `Halloween`, `Thanksgiving`, `Christmas`) plus holiday episode specials.
@@ -36,8 +47,8 @@ The bundled `.NET 10` plugin ([`plugin/Jellyfin.Plugin.Prism`](./plugin/Jellyfin
 - **Performance & Stability**: Shared in-memory library index with batch DB queries (`GetPeopleByItems`, `GetUserDataBatch`), debounced event-driven cache busting, client `localStorage` SWR caching, coalesced `rAF` DOM observation, `.backdropContainer` DOM leak pruning, Dashboard Back Button fix, TV Guide scroll fix (`#5705`), and automatic global CSS injection across `/dashboard/*`.
 - **Optional Native Holiday Collection Sync**: Scheduled Task (`Sync Prism Seasonal Holiday Collection`) so native Android TV surfaces active seasonal picks.
 
-#### Install or Build Plugin
-1. **From GitHub Releases (Prebuilt)**: Download `prism-plugin_vX.Y.Z.zip` (or standalone `Jellyfin.Plugin.Prism.dll`) from the [Releases](https://github.com/gemcdaniel/jellyfin-plugin-prism/releases) page, extract/copy into your Jellyfin server's plugins directory (e.g. `<jellyfin-data>/plugins/Prism/Jellyfin.Plugin.Prism.dll`), and restart Jellyfin.
+### Option 2: Manual Plugin Package or Build from Source
+1. **From GitHub Releases**: Download `prism-plugin_vX.Y.Z.zip` (or standalone `Jellyfin.Plugin.Prism.dll`) from the [Releases](https://github.com/gemcdaniel/jellyfin-plugin-prism/releases) page, extract/copy into your Jellyfin server's plugins directory (e.g. `<jellyfin-data>/plugins/Prism/Jellyfin.Plugin.Prism.dll`), and restart Jellyfin.
 2. **Or Build from Source**:
    ```bash
    npm run build:plugin
@@ -45,7 +56,7 @@ The bundled `.NET 10` plugin ([`plugin/Jellyfin.Plugin.Prism`](./plugin/Jellyfin
    Then copy `plugin/Jellyfin.Plugin.Prism/bin/Release/net10.0/Jellyfin.Plugin.Prism.dll` into your Jellyfin plugins directory and restart Jellyfin.
 3. *(Recommended)* Clear any pasted CSS from **Dashboard → Branding → Custom CSS** so it isn't loaded twice, then configure toggles under **Dashboard → Plugins → Prism**.
 
-### Option 2: CSS-Only Installation (No Plugin)
+### Option 3: CSS-Only Installation (No Plugin)
 1. Open your Jellyfin server **Dashboard → Branding → Custom CSS**.
 2. Paste an `@import` pointing to your hosted `dist/prism.min.css`, or copy the contents of [`dist/prism.min.css`](./dist/prism.min.css) directly into the Custom CSS box:
 
@@ -88,6 +99,7 @@ All colors, radii, and focus halos are exposed as CSS variables in [`src/tokens.
 - `src/js/` — Modular client runtime bundled into `plugin/Jellyfin.Plugin.Prism/Web/prism.js`
 - `dist/prism.css` & `dist/prism.min.css` — Bundled single-file CSS outputs
 - `plugin/Jellyfin.Plugin.Prism/` — Jellyfin 12.4 `.NET 10` plugin source (HTML middleware, shared library index, Discovery & Home APIs, TMDB background service, Watchlist auto-remove lifecycle, TV Guide scroll fix, and Collection sync task)
+- `manifest.json`, `build.yaml`, & `assets/` — Official Jellyfin Plugin Repository catalog manifest, build metadata, and catalog logo (`assets/logo.png`)
 - `preview/index.html` — Offline Jellyfin DOM preview harness (Desktop / TV / Mobile + Home / Detail + Media Bar toggle)
 
 ### Build, Lint, Test & Local Preview

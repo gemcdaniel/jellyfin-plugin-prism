@@ -118,6 +118,8 @@ function main() {
   const stagedMeta = path.join(stagingDir, 'meta.json');
   const nowIso = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
 
+  const changelog = `Release v${rawVersion} — see https://github.com/${repo}/releases/tag/v${rawVersion}`;
+
   const meta = {
     guid: 'd8a4b2e1-7c3f-4e92-9b14-6f2c8d5a1e03',
     name: 'Prism',
@@ -129,6 +131,7 @@ function main() {
     version: assemblyVersion,
     targetAbi: '12.4.0.0',
     timestamp: nowIso,
+    changelog,
     status: 'Active',
     autoUpdate: true,
     assemblies: ['Jellyfin.Plugin.Prism.dll'],
@@ -151,7 +154,7 @@ function main() {
     return {
       name,
       sha256: hashFile(filePath, 'sha256'),
-      md5: hashFile(filePath, 'md5').toUpperCase(),
+      md5: hashFile(filePath, 'md5').toLowerCase(),
     };
   });
 
@@ -166,7 +169,7 @@ function main() {
   const zipChecksum = checksumRecords.find((r) => r.name === zipName);
   const manifestEntry = {
     version: assemblyVersion,
-    changelog: `Release v${rawVersion} — see https://github.com/${repo}/releases/tag/v${rawVersion}`,
+    changelog,
     targetAbi: '12.4.0.0',
     sourceUrl: `https://github.com/${repo}/releases/download/v${rawVersion}/${zipName}`,
     checksum: zipChecksum.md5,
@@ -181,12 +184,18 @@ function main() {
   const notes = [
     `## Installation`,
     '',
-    `### Option 1: Jellyfin Plugin Package (Recommended for Jellyfin 12.4+)`,
+    `### Option 1: Official Jellyfin Plugin Repository (Recommended for Jellyfin 12.4+)`,
+    `1. In Jellyfin, open **Dashboard → Plugins → Repositories → +** (Add).`,
+    `2. Enter Repository Name \`Prism\` and Repository URL:`,
+    `   \`https://raw.githubusercontent.com/${repo}/main/manifest.json\``,
+    `3. Save, open **Dashboard → Plugins → Catalog**, select **Prism**, click **Install**, and restart Jellyfin.`,
+    '',
+    `### Option 2: Manual Plugin Package (.zip / .dll)`,
     `1. Download **\`${zipName}\`** (or standalone **\`Jellyfin.Plugin.Prism.dll\`**) from the assets below.`,
     `2. Extract/copy \`Jellyfin.Plugin.Prism.dll\` into your Jellyfin plugins directory (for example \`<jellyfin-data>/plugins/Prism/\`).`,
     `3. Restart Jellyfin, clear any duplicate Custom CSS under **Dashboard → Branding → Custom CSS**, and hard-refresh your browser.`,
     '',
-    `### Option 2: CSS-Only (@import via jsDelivr)`,
+    `### Option 3: CSS-Only (@import via jsDelivr)`,
     '```css',
     `@import url("https://cdn.jsdelivr.net/gh/${repo}@v${rawVersion}/dist/prism.min.css");`,
     '```',

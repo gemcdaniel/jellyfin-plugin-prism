@@ -13,7 +13,8 @@
     "test:js": "node --test tests/frontend.test.mjs",
     "test:dotnet": "dotnet test Prism.sln -c Release --verbosity normal",
     "test": "npm run test:js && npm run test:dotnet",
-    "package:release": "node scripts/package-release.mjs"
+    "package:release": "node scripts/package-release.mjs",
+    "update:manifest": "node scripts/update-manifest.mjs"
   },
   "license": "MIT"
 }

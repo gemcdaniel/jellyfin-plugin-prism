@@ -47,4 +47,4 @@ Releases are automated by `.github/workflows/release.yml`:
    git tag -a v1.1.0 -m "Release v1.1.0"
    git push origin v1.1.0
    ```
-   GitHub Actions validates the tag against `<Version>`, runs `npm run lint` and `npm test`, packages `prism-plugin_v1.1.0.zip` + standalone assets, generates checksums, and creates the GitHub Release.
+   GitHub Actions validates the tag against `<Version>`, runs `npm run lint` and `npm test`, packages `prism-plugin_v1.1.0.zip` + standalone assets, generates checksums, publishes the GitHub Release, and (for non-prerelease tags) automatically updates `manifest.json` on `main` so Jellyfin servers pick up the update.

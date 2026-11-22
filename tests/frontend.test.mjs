@@ -11,6 +11,10 @@ import {
   minifyCss,
   stripComments,
 } from '../scripts/build.mjs';
+import {
+  PRISM_GUID,
+  mergeManifestVersion,
+} from '../scripts/update-manifest.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -203,4 +207,88 @@ test('plugin .csproj defines valid semver Version and embeds required Web and Co
   assert.ok(csproj.includes('<EmbeddedResource Include="Configuration\\configPage.html" />'));
   assert.ok(csproj.includes('<EmbeddedResource Include="Web\\prism.js" />'));
   assert.ok(csproj.includes('<EmbeddedResource Include="Web\\prism.min.css" />'));
+});
+
+test('mergeManifestVersion prepends newer releases, updates idempotently, normalizes MD5, and rejects invalid entries', () => {
+  const base = [
+    {
+      guid: PRISM_GUID,
+      name: 'Prism',
+      description: 'Desc',
+      overview: 'Overview',
+      owner: 'gemcdaniel',
+      category: 'General',
+      imageUrl: 'https://raw.githubusercontent.com/gemcdaniel/jellyfin-plugin-prism/main/assets/logo.png',
+      versions: [
+        {
+          version: '1.0.0.0',
+          changelog: 'Initial release',
+          targetAbi: '12.4.0.0',
+          sourceUrl: 'https://github.com/gemcdaniel/jellyfin-plugin-prism/releases/download/v1.0.0/prism-plugin_v1.0.0.zip',
+          checksum: '366578b4b59ff3a46f47bf3319559547',
+          timestamp: '2026-11-22T22:28:57Z',
+        },
+      ],
+    },
+  ];
+
+  const withV110 = mergeManifestVersion(base, {
+    version: '1.1.0.0',
+    changelog: 'Release v1.1.0',
+    targetAbi: '12.4.0.0',
+    sourceUrl: 'https://github.com/gemcdaniel/jellyfin-plugin-prism/releases/download/v1.1.0/prism-plugin_v1.1.0.zip',
+    checksum: 'ABCDEF0123456789ABCDEF0123456789',
+    timestamp: '2026-12-01T12:00:00Z',
+  });
+
+  assert.equal(withV110[0].versions.length, 2);
+  assert.equal(withV110[0].versions[0].version, '1.1.0.0');
+  assert.equal(withV110[0].versions[0].checksum, 'abcdef0123456789abcdef0123456789');
+  assert.equal(withV110[0].versions[1].version, '1.0.0.0');
+
+  const idempotent = mergeManifestVersion(withV110, {
+    version: '1.1.0.0',
+    changelog: 'Release v1.1.0 (republished)',
+    targetAbi: '12.4.0.0',
+    sourceUrl: 'https://github.com/gemcdaniel/jellyfin-plugin-prism/releases/download/v1.1.0/prism-plugin_v1.1.0.zip',
+    checksum: '11111111111111111111111111111111',
+    timestamp: '2026-12-01T12:05:00Z',
+  });
+
+  assert.equal(idempotent[0].versions.length, 2);
+  assert.equal(idempotent[0].versions[0].checksum, '11111111111111111111111111111111');
+  assert.equal(idempotent[0].versions[0].changelog, 'Release v1.1.0 (republished)');
+
+  assert.throws(
+    () =>
+      mergeManifestVersion(base, {
+        version: '1.2.0.0',
+        targetAbi: '12.4.0.0',
+        sourceUrl: 'https://example.com/Prism.dll',
+        checksum: 'abcdef0123456789abcdef0123456789',
+      }),
+    /\.zip/
+  );
+
+  assert.throws(
+    () =>
+      mergeManifestVersion(base, {
+        version: '1.2.0.0',
+        targetAbi: '12.4.0.0',
+        sourceUrl: 'https://example.com/prism.zip',
+        checksum: 'not-md5',
+      }),
+    /MD5/
+  );
+});
+
+test('repository manifest.json and assets/logo.png satisfy Jellyfin plugin repository format', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(rootDir, 'manifest.json'), 'utf8'));
+  assert.ok(Array.isArray(manifest));
+  assert.equal(manifest[0].guid, PRISM_GUID);
+  assert.equal(manifest[0].name, 'Prism');
+  assert.ok(manifest[0].versions.length >= 1);
+
+  const logoBytes = fs.readFileSync(path.join(rootDir, 'assets', 'logo.png'));
+  assert.deepEqual(Array.from(logoBytes.subarray(0, 8)), [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 });

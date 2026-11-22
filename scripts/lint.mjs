@@ -10,6 +10,11 @@ import {
   generateCssOutputs,
   generateJsOutput,
 } from './build.mjs';
+import {
+  PRISM_GUID,
+  compareVersionsDesc,
+  parseVersionParts,
+} from './update-manifest.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -179,6 +184,77 @@ function lintPackageAndWorkflows() {
   for (const filePath of ymlFiles) {
     const content = fs.readFileSync(filePath, 'utf8');
     checkTextHygiene(filePath, content);
+  }
+
+  const buildYamlPath = path.join(rootDir, 'build.yaml');
+  if (!fs.existsSync(buildYamlPath)) {
+    recordError(buildYamlPath, 'missing build.yaml');
+  } else {
+    checkTextHygiene(buildYamlPath, fs.readFileSync(buildYamlPath, 'utf8'));
+  }
+
+  const logoPngPath = path.join(rootDir, 'assets', 'logo.png');
+  if (!fs.existsSync(logoPngPath)) {
+    recordError(logoPngPath, 'missing plugin catalog logo PNG');
+  }
+
+  const manifestPath = path.join(rootDir, 'manifest.json');
+  if (!fs.existsSync(manifestPath)) {
+    recordError(manifestPath, 'missing Jellyfin plugin repository manifest.json');
+  } else {
+    const manifestContent = fs.readFileSync(manifestPath, 'utf8');
+    checkTextHygiene(manifestPath, manifestContent);
+    try {
+      const parsed = JSON.parse(manifestContent);
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        recordError(manifestPath, 'must be a non-empty JSON array');
+      } else {
+        const pkg = parsed.find((p) => p && String(p.guid || '').toLowerCase() === PRISM_GUID);
+        if (!pkg) {
+          recordError(manifestPath, `missing Prism package entry with guid ${PRISM_GUID}`);
+        } else {
+          for (const field of ['name', 'description', 'overview', 'owner', 'category', 'imageUrl']) {
+            if (typeof pkg[field] !== 'string' || !pkg[field].trim()) {
+              recordError(manifestPath, `package missing non-empty "${field}" field`);
+            }
+          }
+          if (!Array.isArray(pkg.versions) || pkg.versions.length === 0) {
+            recordError(manifestPath, 'package must define at least one version entry');
+          } else {
+            for (let i = 0; i < pkg.versions.length; i += 1) {
+              const ver = pkg.versions[i];
+              try {
+                parseVersionParts(ver?.version);
+                parseVersionParts(ver?.targetAbi);
+              } catch (verErr) {
+                recordError(manifestPath, `versions[${i}]: ${verErr.message}`);
+              }
+              if (!ver?.sourceUrl || !/^https?:\/\/.+\.zip$/i.test(ver.sourceUrl)) {
+                recordError(manifestPath, `versions[${i}] sourceUrl must be an HTTP(S) .zip URL`);
+              }
+              if (!ver?.checksum || !/^[0-9a-f]{32}$/i.test(ver.checksum)) {
+                recordError(manifestPath, `versions[${i}] checksum must be a 32-char MD5 hex string`);
+              }
+              if (!ver?.timestamp || Number.isNaN(Date.parse(ver.timestamp))) {
+                recordError(manifestPath, `versions[${i}] has invalid timestamp`);
+              }
+              if (i > 0) {
+                try {
+                  if (compareVersionsDesc(pkg.versions[i - 1], ver) > 0) {
+                    recordError(manifestPath, 'versions array must be sorted descending');
+                    break;
+                  }
+                } catch {
+                  // Invalid version format already recorded above
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      recordError(manifestPath, `invalid JSON: ${err.message}`);
+    }
   }
 }
 

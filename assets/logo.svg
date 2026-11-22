@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Prism Logo">
+  <defs>
+    <radialGradient id="ambient" cx="72%" cy="22%" r="68%">
+      <stop offset="0%" stop-color="#7C5CFF" stop-opacity="0.34" />
+      <stop offset="48%" stop-color="#00D4FF" stop-opacity="0.14" />
+      <stop offset="100%" stop-color="#05070D" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="prismGrad" x1="18%" y1="12%" x2="86%" y2="88%">
+      <stop offset="0%" stop-color="#8B6EFF" />
+      <stop offset="50%" stop-color="#4F9CFF" />
+      <stop offset="100%" stop-color="#00D4FF" />
+    </linearGradient>
+    <linearGradient id="facetLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C5CFF" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#3B429F" stop-opacity="0.72" />
+    </linearGradient>
+    <linearGradient id="facetRight" x1="20%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.92" />
+      <stop offset="100%" stop-color="#00D4FF" stop-opacity="0.55" />
+    </linearGradient>
+    <linearGradient id="facetBase" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C5CFF" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#00D4FF" stop-opacity="0.78" />
+    </linearGradient>
+    <linearGradient id="beam" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="45%" stop-color="#E0F7FF" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#00D4FF" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="#05070D" />
+  <rect width="512" height="512" rx="112" fill="url(#ambient)" />
+  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" />
+
+  <!-- Subtle refraction beam -->
+  <polygon points="88,286 256,222 256,246 88,302" fill="url(#beam)" opacity="0.55" />
+  <polygon points="256,210 432,164 432,194 256,236" fill="url(#prismGrad)" opacity="0.32" />
+  <polygon points="256,232 432,262 432,292 256,252" fill="#00D4FF" opacity="0.24" />
+
+  <!-- Faceted Prism crystal -->
+  <polygon points="256,92 122,344 256,282" fill="url(#facetLeft)" />
+  <polygon points="256,92 390,344 256,282" fill="url(#facetRight)" />
+  <polygon points="122,344 256,282 390,344 256,396" fill="url(#facetBase)" />
+
+  <!-- Specular edge highlights -->
+  <polyline points="122,344 256,92 390,344 256,396 122,344" fill="none" stroke="rgba(244,247,255,0.68)" stroke-width="3.5" stroke-linejoin="round" />
+  <line x1="256" y1="92" x2="256" y2="396" stroke="rgba(244,247,255,0.52)" stroke-width="2.5" />
+  <polyline points="122,344 256,282 390,344" fill="none" stroke="rgba(244,247,255,0.38)" stroke-width="2.5" stroke-linejoin="round" />
+</svg>

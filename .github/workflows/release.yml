@@ -152,3 +152,30 @@ jobs:
               "${PRERELEASE_FLAG[@]}" \
               "${TARGET_FLAGS[@]}"
           fi
+
+      - name: Update Jellyfin plugin repository manifest.json
+        if: steps.meta.outputs.is_prerelease != 'true'
+        run: |
+          set -euo pipefail
+          cp release/manifest-entry.json /tmp/prism-manifest-entry.json
+
+          git fetch origin main
+          git checkout -B main origin/main
+
+          node scripts/update-manifest.mjs \
+            --manifest manifest.json \
+            --entry /tmp/prism-manifest-entry.json \
+            --repo "${{ github.repository }}"
+
+          rm -f /tmp/prism-manifest-entry.json
+
+          if ! git diff --quiet manifest.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add manifest.json
+            git commit -m "chore(release): update manifest.json for ${{ steps.meta.outputs.tag }}"
+            git pull --rebase origin main
+            git push origin main
+          else
+            echo "manifest.json already up to date for ${{ steps.meta.outputs.tag }}"
+          fi

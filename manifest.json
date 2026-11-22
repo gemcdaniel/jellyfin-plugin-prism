@@ -1,0 +1,21 @@
+[
+  {
+    "guid": "d8a4b2e1-7c3f-4e92-9b14-6f2c8d5a1e03",
+    "name": "Prism",
+    "description": "True-black OLED UI, ClearLogo spotlights, 3-day rotating discovery & holiday picks, thematic collections, native watchlist, library infinite scroll, and LG WebOS 60fps guardrails.",
+    "overview": "Complete Jellyfin 12.4+ experience plugin featuring a true-black OLED UI, ClearLogo Hero Spotlight, New Releases, Thematic Picks, Personalized Hybrid Discovery, Native Watchlist integration, Library Infinite Scroll, optional TMDB background polling, and LG WebOS 60fps guardrails.",
+    "owner": "gemcdaniel",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/gemcdaniel/jellyfin-plugin-prism/main/assets/logo.png",
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "Initial release of Prism v1.0.0 — see https://github.com/gemcdaniel/jellyfin-plugin-prism/releases/tag/v1.0.0",
+        "targetAbi": "12.4.0.0",
+        "sourceUrl": "https://github.com/gemcdaniel/jellyfin-plugin-prism/releases/download/v1.0.0/prism-plugin_v1.0.0.zip",
+        "checksum": "366578b4b59ff3a46f47bf3319559547",
+        "timestamp": "2026-11-22T22:28:57Z"
+      }
+    ]
+  }
+]
