@@ -73,6 +73,9 @@ if (window.__prismInit) {
     },
     domSyncRaf: null,
     domSyncTimer: null,
+    routeSyncTimer: null,
+    lastRouteKey: '',
+    historyPatched: false,
     navViewsCache: null,
     navViewsFetchedAt: 0,
     navDrawerOpen: false
@@ -106,19 +109,43 @@ if (window.__prismInit) {
     return Boolean(document.documentElement && document.documentElement.classList.contains('layout-tv'));
   }
 
-  function isHomeRoute() {
+  function getRouteSegment() {
     var hash = (window.location.hash || '').toLowerCase();
-    return hash === '' || hash === '#' || hash === '#/' || hash.indexOf('#/home') === 0 || hash.indexOf('#!/home') === 0;
+    if (hash && hash !== '#' && hash !== '#/') {
+      return hash.replace(/^#!?\/?/, '').split('?')[0];
+    }
+    var path = (window.location.pathname || '').toLowerCase().split('?')[0].replace(/\/+$/, '');
+    if (!path || path === '/web' || path === '/index.html' || path === '/web/index.html') {
+      return 'home';
+    }
+    var webIdx = path.indexOf('/web/');
+    if (webIdx !== -1) {
+      var sub = path.slice(webIdx + 5);
+      return !sub || sub === 'index.html' ? 'home' : sub;
+    }
+    var last = path.split('/').pop() || '';
+    if (/^(movies|tv|music|playlists|livetv|list|details|dashboard|login|search|mypreferencesmenu|userprofile|video|queue)(?:\.html)?$/.test(last)) {
+      return last;
+    }
+    if (path.indexOf('/dashboard/') !== -1) {
+      return 'dashboard/' + last;
+    }
+    return 'home';
+  }
+
+  function isHomeRoute() {
+    var seg = getRouteSegment();
+    return seg === '' || seg === 'home' || seg === 'home.html';
   }
 
   function isDetailsRoute() {
-    var hash = (window.location.hash || '').toLowerCase();
-    return hash.indexOf('#/details') === 0 || hash.indexOf('#!/details') === 0;
+    var seg = getRouteSegment();
+    return seg === 'details' || seg === 'details.html';
   }
 
   function isDashboardRoute() {
-    var hash = (window.location.hash || '').toLowerCase();
-    return hash.indexOf('#/dashboard') === 0 || hash.indexOf('#!/dashboard') === 0;
+    var seg = getRouteSegment();
+    return seg === 'dashboard' || seg === 'dashboard.html' || seg.indexOf('dashboard/') === 0;
   }
 
   function getDetailItemId() {
@@ -539,8 +566,8 @@ if (window.__prismInit) {
   };
 
   function isLoginRoute() {
-    var hash = (window.location.hash || '').toLowerCase();
-    return hash.indexOf('#/login') === 0 || hash.indexOf('#!/login') === 0;
+    var seg = getRouteSegment();
+    return seg === 'login' || seg === 'login.html';
   }
 
   function buildLibraryNavHref(view) {
@@ -2990,9 +3017,82 @@ if (window.__prismInit) {
       });
   }
 
+  function getRouteKey() {
+    if (!window.location) return '';
+    return (window.location.pathname || '') + (window.location.search || '') + (window.location.hash || '');
+  }
+
+  function handleRouteChange(force) {
+    var nextKey = getRouteKey();
+    if (!force && nextKey === state.lastRouteKey) {
+      return;
+    }
+    state.lastRouteKey = nextKey;
+
+    if (state.routeSyncTimer) {
+      window.clearTimeout(state.routeSyncTimer);
+      state.routeSyncTimer = null;
+    }
+
+    closePrismNavDrawer();
+    syncDashboardThemeState();
+    syncDesktopHamburgerMenu();
+    if (!isHomeRoute()) {
+      clearHeroSpotlightTimers();
+      resetDiscoveryState();
+    }
+    if (!isHomeRoute() && !isDetailsRoute()) {
+      resetAmbientColor();
+    }
+    teardownLibraryInfiniteScroll();
+    syncPageHeroClasses();
+
+    state.routeSyncTimer = window.setTimeout(function () {
+      state.routeSyncTimer = null;
+      ensureBackdropLeakFix();
+      syncDesktopHamburgerMenu();
+      syncHeaderMetrics();
+      tryEnhanceHome();
+      tryEnhanceDetailPage();
+      tryInitLibraryInfiniteScroll();
+      syncPageHeroClasses();
+      scheduleNativeBadgeScan();
+      focusFirstHomeTarget();
+    }, 150);
+  }
+
+  function patchHistoryNavigation() {
+    if (!window.history || state.historyPatched) {
+      return;
+    }
+    state.historyPatched = true;
+
+    if (typeof window.history.pushState === 'function') {
+      var origPushState = window.history.pushState;
+      window.history.pushState = function () {
+        var ret = origPushState.apply(window.history, arguments);
+        handleRouteChange(false);
+        return ret;
+      };
+    }
+
+    if (typeof window.history.replaceState === 'function') {
+      var origReplaceState = window.history.replaceState;
+      window.history.replaceState = function () {
+        var ret = origReplaceState.apply(window.history, arguments);
+        handleRouteChange(false);
+        return ret;
+      };
+    }
+  }
+
   function runCoalescedDomSync() {
+    if (getRouteKey() !== state.lastRouteKey) {
+      handleRouteChange(false);
+    }
     ensureBackdropLeakFix();
     syncDesktopHamburgerMenu();
+    syncPageHeroClasses();
     if (isHomeRoute()) {
       tryEnhanceHome();
     } else if (isDetailsRoute()) {
@@ -3050,32 +3150,22 @@ if (window.__prismInit) {
       window.setTimeout(focusFirstHomeTarget, 250);
     });
 
-    window.addEventListener('hashchange', function () {
-      closePrismNavDrawer();
-      syncDashboardThemeState();
-      syncDesktopHamburgerMenu();
-      if (!isHomeRoute()) {
-        clearHeroSpotlightTimers();
-        resetDiscoveryState();
-      }
-      if (!isHomeRoute() && !isDetailsRoute()) {
-        resetAmbientColor();
-      }
-      teardownLibraryInfiniteScroll();
-      syncPageHeroClasses();
+    state.lastRouteKey = getRouteKey();
+    patchHistoryNavigation();
 
-      window.setTimeout(function () {
-        ensureBackdropLeakFix();
-        syncDesktopHamburgerMenu();
-        syncHeaderMetrics();
-        tryEnhanceHome();
-        tryEnhanceDetailPage();
-        tryInitLibraryInfiniteScroll();
-        syncPageHeroClasses();
-        scheduleNativeBadgeScan();
-        focusFirstHomeTarget();
-      }, 150);
+    window.addEventListener('hashchange', function () {
+      handleRouteChange(true);
     });
+
+    window.addEventListener('popstate', function () {
+      handleRouteChange(false);
+    });
+
+    document.addEventListener('viewshow', function () {
+      syncPageHeroClasses();
+      syncHeaderMetrics();
+      scheduleDomSync();
+    }, true);
 
     var observer = new MutationObserver(scheduleDomSync);
     if (document.body) {

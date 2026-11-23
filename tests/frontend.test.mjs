@@ -862,3 +862,159 @@ test('Hero spotlight handles horizontal touch swipes without triggering on verti
   playBtnOnSlide2.dispatchEvent({ type: 'click', cancelable: true });
   assert.deepEqual(navigated, ['/details?id=item3']);
 });
+
+test('Navigating from Home via pushState, popstate, or DOM sync clears prism-hero-page and prism-home-route', async () => {
+  const prismJs = fs.readFileSync(
+    path.join(rootDir, 'plugin', 'Jellyfin.Plugin.Prism', 'Web', 'prism.js'),
+    'utf8'
+  );
+  const { makeElement, mockDocument } = createMiniDom();
+
+  const pageEl = makeElement('div');
+  pageEl.className = 'page homePage libraryPage';
+  const sectionsEl = makeElement('div');
+  sectionsEl.className = 'homeSectionsContainer';
+  pageEl.appendChild(sectionsEl);
+  mockDocument.body.appendChild(pageEl);
+
+  const winListeners = new Map();
+  let observerCb = null;
+
+  const mockWindow = {
+    location: { hash: '#/home', pathname: '/web/', search: '' },
+    innerWidth: 1440,
+    scrollY: 0,
+    pageYOffset: 0,
+    history: {
+      length: 1,
+      state: null,
+      pushState(_state, _title, url) {
+        const str = String(url || '');
+        const hashIdx = str.indexOf('#');
+        if (hashIdx >= 0) {
+          mockWindow.location.hash = str.slice(hashIdx);
+        } else {
+          const qIdx = str.indexOf('?');
+          mockWindow.location.pathname = qIdx >= 0 ? str.slice(0, qIdx) : str;
+          mockWindow.location.search = qIdx >= 0 ? str.slice(qIdx) : '';
+          mockWindow.location.hash = '';
+        }
+      },
+      replaceState(_state, _title, url) {
+        mockWindow.history.pushState(_state, _title, url);
+      },
+    },
+    addEventListener: (type, fn) => {
+      if (!winListeners.has(type)) winListeners.set(type, []);
+      winListeners.get(type).push(fn);
+    },
+    setTimeout: (fn) => {
+      fn();
+      return 1;
+    },
+    clearTimeout: () => {},
+    requestAnimationFrame: (cb) => {
+      cb();
+      return 1;
+    },
+    localStorage: {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    },
+    ApiClient: {
+      getCurrentUserId: () => 'user1',
+      getUrl: (rel) => `/${rel}`,
+      getJSON: (url) => {
+        if (url.includes('HomeSections')) {
+          return Promise.resolve({
+            CacheVersion: 'v1',
+            DiscoveryAvailable: false,
+            HeroItems: [
+              { Id: 'item1', Name: 'Hero Movie', Overview: 'Plot', HasBackdrop: true, BackdropCount: 1 },
+            ],
+            Sections: [],
+          });
+        }
+        return Promise.resolve({ Ids: [] });
+      },
+    },
+    document: mockDocument,
+    MutationObserver: class {
+      constructor(cb) {
+        observerCb = cb;
+      }
+      observe() {}
+      disconnect() {}
+    },
+    fetch: () => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        enablePlugin: true,
+        enableHeroSpotlight: true,
+        enableWatchlist: false,
+        enableHomeSections: false,
+        enableInfiniteDiscovery: false,
+      }),
+    }),
+  };
+
+  const sandbox = {
+    window: mockWindow,
+    document: mockDocument,
+    MutationObserver: mockWindow.MutationObserver,
+    fetch: mockWindow.fetch,
+    Image: class {},
+    Promise,
+    Date,
+    Math,
+    Number,
+    String,
+    Boolean,
+    Object,
+    Array,
+    JSON,
+    encodeURIComponent,
+    decodeURIComponent,
+    setTimeout: mockWindow.setTimeout,
+    clearTimeout: mockWindow.clearTimeout,
+  };
+  sandbox.globalThis = sandbox;
+  sandbox.self = sandbox;
+
+  vm.runInContext(prismJs, vm.createContext(sandbox));
+  await new Promise((r) => setImmediate(r));
+  await new Promise((r) => setImmediate(r));
+
+  assert.equal(mockDocument.documentElement.classList.contains('prism-home-route'), true);
+  assert.equal(mockDocument.documentElement.classList.contains('prism-hero-page'), true);
+
+  // Clicking a My Media tile uses SPA pushState without firing hashchange
+  mockWindow.history.pushState({}, '', '#/movies?topParentId=movies1');
+  assert.equal(mockDocument.documentElement.classList.contains('prism-home-route'), false);
+  assert.equal(mockDocument.documentElement.classList.contains('prism-hero-page'), false);
+
+  // Browser back/forward fires popstate without hashchange
+  mockWindow.location.hash = '#/home';
+  for (const fn of winListeners.get('popstate') || []) fn({});
+  assert.equal(mockDocument.documentElement.classList.contains('prism-home-route'), true);
+  assert.equal(mockDocument.documentElement.classList.contains('prism-hero-page'), true);
+
+  // Pathname-based SPA navigation (empty hash) also clears hero/home classes
+  mockWindow.history.pushState({}, '', '/web/tv?topParentId=tv1');
+  assert.equal(mockDocument.documentElement.classList.contains('prism-home-route'), false);
+  assert.equal(mockDocument.documentElement.classList.contains('prism-hero-page'), false);
+
+  // Returning home and mutating hash out-of-band still syncs via MutationObserver fallback
+  mockWindow.location.pathname = '/web/';
+  mockWindow.location.search = '';
+  mockWindow.location.hash = '#/home';
+  for (const fn of winListeners.get('hashchange') || []) fn({});
+  assert.equal(mockDocument.documentElement.classList.contains('prism-hero-page'), true);
+
+  mockWindow.location.hash = '#/list?parentId=other1';
+  if (observerCb) observerCb();
+  assert.equal(mockDocument.documentElement.classList.contains('prism-home-route'), false);
+  assert.equal(mockDocument.documentElement.classList.contains('prism-hero-page'), false);
+});
+

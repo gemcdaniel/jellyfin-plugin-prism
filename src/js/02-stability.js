@@ -232,8 +232,8 @@
   };
 
   function isLoginRoute() {
-    var hash = (window.location.hash || '').toLowerCase();
-    return hash.indexOf('#/login') === 0 || hash.indexOf('#!/login') === 0;
+    var seg = getRouteSegment();
+    return seg === 'login' || seg === 'login.html';
   }
 
   function buildLibraryNavHref(view) {

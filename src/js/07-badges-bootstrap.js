@@ -213,9 +213,82 @@
       });
   }
 
+  function getRouteKey() {
+    if (!window.location) return '';
+    return (window.location.pathname || '') + (window.location.search || '') + (window.location.hash || '');
+  }
+
+  function handleRouteChange(force) {
+    var nextKey = getRouteKey();
+    if (!force && nextKey === state.lastRouteKey) {
+      return;
+    }
+    state.lastRouteKey = nextKey;
+
+    if (state.routeSyncTimer) {
+      window.clearTimeout(state.routeSyncTimer);
+      state.routeSyncTimer = null;
+    }
+
+    closePrismNavDrawer();
+    syncDashboardThemeState();
+    syncDesktopHamburgerMenu();
+    if (!isHomeRoute()) {
+      clearHeroSpotlightTimers();
+      resetDiscoveryState();
+    }
+    if (!isHomeRoute() && !isDetailsRoute()) {
+      resetAmbientColor();
+    }
+    teardownLibraryInfiniteScroll();
+    syncPageHeroClasses();
+
+    state.routeSyncTimer = window.setTimeout(function () {
+      state.routeSyncTimer = null;
+      ensureBackdropLeakFix();
+      syncDesktopHamburgerMenu();
+      syncHeaderMetrics();
+      tryEnhanceHome();
+      tryEnhanceDetailPage();
+      tryInitLibraryInfiniteScroll();
+      syncPageHeroClasses();
+      scheduleNativeBadgeScan();
+      focusFirstHomeTarget();
+    }, 150);
+  }
+
+  function patchHistoryNavigation() {
+    if (!window.history || state.historyPatched) {
+      return;
+    }
+    state.historyPatched = true;
+
+    if (typeof window.history.pushState === 'function') {
+      var origPushState = window.history.pushState;
+      window.history.pushState = function () {
+        var ret = origPushState.apply(window.history, arguments);
+        handleRouteChange(false);
+        return ret;
+      };
+    }
+
+    if (typeof window.history.replaceState === 'function') {
+      var origReplaceState = window.history.replaceState;
+      window.history.replaceState = function () {
+        var ret = origReplaceState.apply(window.history, arguments);
+        handleRouteChange(false);
+        return ret;
+      };
+    }
+  }
+
   function runCoalescedDomSync() {
+    if (getRouteKey() !== state.lastRouteKey) {
+      handleRouteChange(false);
+    }
     ensureBackdropLeakFix();
     syncDesktopHamburgerMenu();
+    syncPageHeroClasses();
     if (isHomeRoute()) {
       tryEnhanceHome();
     } else if (isDetailsRoute()) {
@@ -273,32 +346,22 @@
       window.setTimeout(focusFirstHomeTarget, 250);
     });
 
-    window.addEventListener('hashchange', function () {
-      closePrismNavDrawer();
-      syncDashboardThemeState();
-      syncDesktopHamburgerMenu();
-      if (!isHomeRoute()) {
-        clearHeroSpotlightTimers();
-        resetDiscoveryState();
-      }
-      if (!isHomeRoute() && !isDetailsRoute()) {
-        resetAmbientColor();
-      }
-      teardownLibraryInfiniteScroll();
-      syncPageHeroClasses();
+    state.lastRouteKey = getRouteKey();
+    patchHistoryNavigation();
 
-      window.setTimeout(function () {
-        ensureBackdropLeakFix();
-        syncDesktopHamburgerMenu();
-        syncHeaderMetrics();
-        tryEnhanceHome();
-        tryEnhanceDetailPage();
-        tryInitLibraryInfiniteScroll();
-        syncPageHeroClasses();
-        scheduleNativeBadgeScan();
-        focusFirstHomeTarget();
-      }, 150);
+    window.addEventListener('hashchange', function () {
+      handleRouteChange(true);
     });
+
+    window.addEventListener('popstate', function () {
+      handleRouteChange(false);
+    });
+
+    document.addEventListener('viewshow', function () {
+      syncPageHeroClasses();
+      syncHeaderMetrics();
+      scheduleDomSync();
+    }, true);
 
     var observer = new MutationObserver(scheduleDomSync);
     if (document.body) {

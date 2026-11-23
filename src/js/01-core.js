@@ -68,6 +68,9 @@
     },
     domSyncRaf: null,
     domSyncTimer: null,
+    routeSyncTimer: null,
+    lastRouteKey: '',
+    historyPatched: false,
     navViewsCache: null,
     navViewsFetchedAt: 0,
     navDrawerOpen: false
@@ -101,19 +104,43 @@
     return Boolean(document.documentElement && document.documentElement.classList.contains('layout-tv'));
   }
 
-  function isHomeRoute() {
+  function getRouteSegment() {
     var hash = (window.location.hash || '').toLowerCase();
-    return hash === '' || hash === '#' || hash === '#/' || hash.indexOf('#/home') === 0 || hash.indexOf('#!/home') === 0;
+    if (hash && hash !== '#' && hash !== '#/') {
+      return hash.replace(/^#!?\/?/, '').split('?')[0];
+    }
+    var path = (window.location.pathname || '').toLowerCase().split('?')[0].replace(/\/+$/, '');
+    if (!path || path === '/web' || path === '/index.html' || path === '/web/index.html') {
+      return 'home';
+    }
+    var webIdx = path.indexOf('/web/');
+    if (webIdx !== -1) {
+      var sub = path.slice(webIdx + 5);
+      return !sub || sub === 'index.html' ? 'home' : sub;
+    }
+    var last = path.split('/').pop() || '';
+    if (/^(movies|tv|music|playlists|livetv|list|details|dashboard|login|search|mypreferencesmenu|userprofile|video|queue)(?:\.html)?$/.test(last)) {
+      return last;
+    }
+    if (path.indexOf('/dashboard/') !== -1) {
+      return 'dashboard/' + last;
+    }
+    return 'home';
+  }
+
+  function isHomeRoute() {
+    var seg = getRouteSegment();
+    return seg === '' || seg === 'home' || seg === 'home.html';
   }
 
   function isDetailsRoute() {
-    var hash = (window.location.hash || '').toLowerCase();
-    return hash.indexOf('#/details') === 0 || hash.indexOf('#!/details') === 0;
+    var seg = getRouteSegment();
+    return seg === 'details' || seg === 'details.html';
   }
 
   function isDashboardRoute() {
-    var hash = (window.location.hash || '').toLowerCase();
-    return hash.indexOf('#/dashboard') === 0 || hash.indexOf('#!/dashboard') === 0;
+    var seg = getRouteSegment();
+    return seg === 'dashboard' || seg === 'dashboard.html' || seg.indexOf('dashboard/') === 0;
   }
 
   function getDetailItemId() {
