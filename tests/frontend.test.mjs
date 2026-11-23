@@ -319,6 +319,38 @@ test('CSS clears native itemBackdrop image when Prism detail backdrop is active'
   assert.ok(bundledCss.includes('.itemDetailPage.has-prism-backdrop .itemBackdrop'));
 });
 
+test('CSS scopes full-width Play CTA and hero button stretching to phones (<=640px), keeping tablet buttons compact', () => {
+  const mobileCss = fs.readFileSync(path.join(rootDir, 'src', 'mobile.css'), 'utf8');
+  const heroCss = fs.readFileSync(path.join(rootDir, 'src', 'hero.css'), 'utf8');
+
+  const mobilePhoneSplit = mobileCss.split('@media (max-width: 640px)');
+  assert.equal(mobilePhoneSplit.length, 2);
+  assert.equal(mobilePhoneSplit[0].includes('flex: 1 1 100%;'), false);
+  assert.equal(mobilePhoneSplit[0].includes('.layout-mobile .mainDetailButtons {'), false);
+  assert.ok(mobilePhoneSplit[1].includes('flex: 1 1 100%;'));
+
+  const heroPhoneSplit = heroCss.split('@media (max-width: 640px)');
+  assert.equal(heroPhoneSplit.length, 2);
+  assert.equal(heroPhoneSplit[0].includes('flex: 1 1 auto;'), false);
+  assert.ok(heroPhoneSplit[1].includes('flex: 1 1 auto;'));
+});
+
+test('CSS styles sleek menu rows, full-card selection ring with circular checkbox, and centered card overlays', () => {
+  const baseCss = fs.readFileSync(path.join(rootDir, 'src', 'base.css'), 'utf8');
+  const cardsCss = fs.readFileSync(path.join(rootDir, 'src', 'cards.css'), 'utf8');
+  const mobileCss = fs.readFileSync(path.join(rootDir, 'src', 'mobile.css'), 'utf8');
+  const bundledCss = fs.readFileSync(path.join(rootDir, 'dist', 'prism.css'), 'utf8');
+
+  assert.ok(baseCss.includes('.actionSheetMenuItem'));
+  assert.ok(baseCss.includes('.MuiMenu-paper .MuiMenuItem-root'));
+  assert.ok(mobileCss.includes('.layout-mobile .listItem:not(.actionSheetMenuItem):not(.listItem-button)'));
+  assert.ok(cardsCss.includes('.card .cardOverlayFab-primary'));
+  assert.ok(cardsCss.includes('html.layout-mobile .card:not(:focus-within) .cardOverlayContainer'));
+  assert.ok(cardsCss.includes('.chkCardSelectContainer .checkboxOutline'));
+  assert.ok(cardsCss.includes('.card:has(.chkCardSelect:checked) .cardBox'));
+  assert.ok(bundledCss.includes('.itemSelectionPanel'));
+});
+
 function createMiniDom() {
   const parseAttrs = (raw) => {
     const attrs = new Map();

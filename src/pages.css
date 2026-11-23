@@ -268,11 +268,20 @@
 
 #myPreferencesMenuPage .listItem,
 .readOnlyContent .listItem {
-  min-height: 3.35rem;
-  padding: 0.85rem 1.15rem !important;
-  margin-bottom: 0.65rem;
+  min-height: 2.85rem !important;
+  padding: 0.55rem 0.9rem !important;
+  margin-bottom: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--prism-radius-sm) !important;
   display: flex;
   align-items: center;
+}
+
+#myPreferencesMenuPage .listItem:hover,
+.readOnlyContent .listItem:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--prism-border);
 }
 
 .readOnlyContent .listItemIcon {

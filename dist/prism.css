@@ -208,7 +208,8 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   border-right: 1px solid var(--prism-border) !important;
 }
 
-.MuiDrawer-docked .MuiListItemButton-root {
+.MuiDrawer-docked .MuiListItemButton-root,
+.MuiDrawer-paper .MuiListItemButton-root {
   border-radius: 10px !important;
   margin: 2px 10px !important;
   padding: 8px 12px !important;
@@ -216,12 +217,14 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   transition: background-color 160ms var(--prism-ease), color 160ms var(--prism-ease);
 }
 
-.MuiDrawer-docked .MuiListItemButton-root:hover {
+.MuiDrawer-docked .MuiListItemButton-root:hover,
+.MuiDrawer-paper .MuiListItemButton-root:hover {
   background-color: rgba(255, 255, 255, 0.06) !important;
   color: var(--prism-text) !important;
 }
 
-.MuiDrawer-docked .MuiListItemButton-root.Mui-selected {
+.MuiDrawer-docked .MuiListItemButton-root.Mui-selected,
+.MuiDrawer-paper .MuiListItemButton-root.Mui-selected {
   background: linear-gradient(135deg, rgba(124, 92, 255, 0.24), rgba(0, 212, 255, 0.16)) !important;
   border: 1px solid rgba(0, 212, 255, 0.35) !important;
   color: var(--prism-text) !important;
@@ -346,8 +349,11 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 
 .navMenuOption {
   color: var(--prism-text-muted) !important;
-  border-radius: var(--prism-radius-md);
-  margin: 0.15rem 0.6rem;
+  border-radius: var(--prism-radius-sm);
+  margin: 0.12rem 0.5rem;
+  padding: 0.5rem 0.85rem;
+  min-height: 2.55rem;
+  border: 1px solid transparent;
   transition: background-color 160ms var(--prism-ease), color 160ms var(--prism-ease);
 }
 
@@ -467,6 +473,120 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 
 .formDialogFooter {
   border-top: 1px solid var(--prism-border);
+}
+
+/* Compact Sleek Menu Rows (Action Sheets, Context Menus & MUI Popovers) */
+.actionSheet,
+.MuiMenu-paper,
+.MuiPopover-paper {
+  border-radius: var(--prism-radius-md) !important;
+}
+
+.actionSheet {
+  padding: 0.4rem !important;
+  min-width: min(260px, 88vw);
+}
+
+.actionSheetContent {
+  padding: 0 !important;
+}
+
+.actionSheetTitle {
+  padding: 0.45rem 0.75rem 0.55rem;
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--prism-text-dim);
+  border-bottom: 1px solid var(--prism-border);
+}
+
+.actionSheetScroller {
+  padding: 0.1rem 0 !important;
+}
+
+.actionSheet .listItem,
+.actionSheetMenuItem,
+.dialog .listItem.listItem-button,
+.mainDrawer .listItem {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  text-align: left !important;
+  box-sizing: border-box;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: var(--prism-radius-sm) !important;
+  margin: 0.1rem 0 !important;
+  padding: 0.48rem 0.75rem !important;
+  min-height: 2.6rem !important;
+  box-shadow: none !important;
+  color: var(--prism-text) !important;
+  cursor: pointer;
+}
+
+.actionSheet .listItem:hover,
+.actionSheetMenuItem:hover,
+.dialog .listItem.listItem-button:hover,
+.mainDrawer .listItem:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.actionSheetMenuItem-selected,
+.actionSheet .listItem[data-selected="true"] {
+  background: linear-gradient(135deg, rgba(var(--prism-dynamic-rgb), 0.24), rgba(var(--prism-dynamic-2-rgb), 0.14)) !important;
+  color: var(--prism-text) !important;
+}
+
+.actionSheet .listItemBody,
+.actionSheetMenuItem .listItemBody {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 !important;
+}
+
+.actionSheet .listItemBodyText,
+.actionSheetMenuItem .listItemBodyText {
+  font-size: 0.92rem !important;
+  font-weight: 500;
+}
+
+.actionSheet .listItemIcon,
+.actionSheetMenuItem .listItemIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem !important;
+  color: var(--prism-text-muted);
+}
+
+.MuiMenu-paper .MuiList-root,
+.MuiPopover-paper .MuiMenu-list {
+  padding: 0.35rem !important;
+}
+
+.MuiMenu-paper .MuiMenuItem-root,
+.MuiPopover-paper .MuiMenuItem-root {
+  border-radius: var(--prism-radius-sm) !important;
+  min-height: 2.5rem !important;
+  padding: 0.45rem 0.85rem !important;
+  margin: 0.1rem 0 !important;
+  font-size: 0.9rem;
+  color: var(--prism-text) !important;
+}
+
+.MuiMenu-paper .MuiMenuItem-root:hover,
+.MuiPopover-paper .MuiMenuItem-root:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.MuiMenu-paper .MuiMenuItem-root.Mui-selected,
+.MuiPopover-paper .MuiMenuItem-root.Mui-selected {
+  background: linear-gradient(135deg, rgba(var(--prism-dynamic-rgb), 0.24), rgba(var(--prism-dynamic-2-rgb), 0.14)) !important;
 }
 
 /* Thin OLED Scrollbars */
@@ -717,7 +837,7 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 
 /* Card Containers */
 .card {
-  padding: 0.22rem !important;
+  padding: 0.25rem !important;
 }
 
 .cardBox {
@@ -778,17 +898,153 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   box-shadow: 0 10px 28px rgba(124, 92, 255, 0.65), 0 0 22px rgba(0, 212, 255, 0.45);
 }
 
-/* Center overlay play button cleanly inside dynamically injected plugin cards */
-.prism-home-section .cardOverlayFab-primary {
+/* Center overlay play button cleanly across native and injected cards */
+.cardOverlayContainer .cardOverlayFab-primary,
+.card .cardOverlayFab-primary {
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
   margin: 0 !important;
   transform: translate(-50%, -50%) !important;
 }
 
-.prism-home-section .cardOverlayFab-primary:hover {
+.cardOverlayContainer .cardOverlayFab-primary:hover,
+.card .cardOverlayFab-primary:hover {
   transform: translate(-50%, -50%) scale(1.08) !important;
+}
+
+html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
+  opacity: 0 !important;
+}
+
+@media (hover: none) {
+  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayContainer {
+    opacity: 0 !important;
+  }
+}
+
+/* Redesigned Multi-Select Ring & Circular Corner Checkbox (Movies, TV Shows, Grids) */
+.itemSelectionPanel {
+  border: none !important;
+  outline: none !important;
+  border-radius: inherit !important;
+  background-color: rgba(8, 10, 16, 0.24) !important;
+  box-shadow: none !important;
+  transition: background-color 150ms var(--prism-ease);
+}
+
+.itemSelectionPanel .chkCardSelectContainer,
+.cardScalable .chkCardSelectContainer {
+  position: absolute !important;
+  top: 0.45rem !important;
+  left: 0.45rem !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 6 !important;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+}
+
+.chkCardSelectContainer .checkboxLabel {
+  display: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.chkCardSelectContainer .chkCardSelect {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.chkCardSelectContainer .checkboxOutline {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  margin: 0 !important;
+  border-radius: var(--prism-radius-pill) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.72) !important;
+  background-color: rgba(8, 10, 16, 0.8) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.65) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background 150ms var(--prism-ease), border-color 150ms var(--prism-ease), box-shadow 150ms var(--prism-ease);
+}
+
+.chkCardSelectContainer .chkCardSelect:checked ~ .checkboxOutline,
+.chkCardSelectContainer .chkCardSelect:checked + .checkboxOutline {
+  background: var(--prism-gradient) !important;
+  border-color: rgba(255, 255, 255, 0.92) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(0, 212, 255, 0.48) !important;
+}
+
+.chkCardSelectContainer .checkboxIcon-checked {
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+
+.itemSelectionPanel .MuiCheckbox-root {
+  position: absolute !important;
+  top: 0.35rem !important;
+  left: 0.35rem !important;
+  padding: 4px !important;
+  border-radius: var(--prism-radius-pill) !important;
+  background-color: rgba(8, 10, 16, 0.78) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.itemSelectionPanel .MuiCheckbox-root.Mui-checked {
+  background: var(--prism-gradient) !important;
+  color: #FFFFFF !important;
+}
+
+.card.selected,
+.card.selected .cardScalable,
+.card.selected .cardContent,
+.card.selected .cardImageContainer {
+  outline: none !important;
+}
+
+.card.selected .cardBox,
+.card[data-selected="true"] .cardBox {
+  border-color: var(--prism-accent-2) !important;
+  box-shadow: 0 0 0 2.5px var(--prism-accent-2), 0 10px 24px rgba(var(--prism-dynamic-rgb), 0.35) !important;
+}
+
+@supports selector(:has(*)) {
+  .card:has(.itemSelectionPanel) .prism-card-badges {
+    opacity: 0;
+  }
+
+  .card:has(.chkCardSelect:checked) .itemSelectionPanel {
+    background-color: rgba(var(--prism-dynamic-rgb), 0.16) !important;
+  }
+
+  .card:has(.chkCardSelect:checked) .cardBox {
+    border-color: var(--prism-accent-2) !important;
+    box-shadow: 0 0 0 2.5px var(--prism-accent-2), 0 10px 24px rgba(var(--prism-dynamic-rgb), 0.35) !important;
+  }
 }
 
 .cardOverlayButton {
@@ -1588,11 +1844,20 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 
 #myPreferencesMenuPage .listItem,
 .readOnlyContent .listItem {
-  min-height: 3.35rem;
-  padding: 0.85rem 1.15rem !important;
-  margin-bottom: 0.65rem;
+  min-height: 2.85rem !important;
+  padding: 0.55rem 0.9rem !important;
+  margin-bottom: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--prism-radius-sm) !important;
   display: flex;
   align-items: center;
+}
+
+#myPreferencesMenuPage .listItem:hover,
+.readOnlyContent .listItem:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--prism-border);
 }
 
 .readOnlyContent .listItemIcon {
@@ -2152,7 +2417,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 }
 
 .layout-mobile #slides-container .button-container {
-  width: 100%;
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
@@ -2164,11 +2428,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   min-height: 40px;
   justify-content: center;
   white-space: nowrap;
-}
-
-.layout-mobile #slides-container .play-button {
-  flex: 1 1 auto;
-  text-align: center;
 }
 
 .layout-mobile #slides-container .arrow-button {
@@ -2235,7 +2494,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
 }
 
 .layout-mobile .prism-inline-spotlight .button-container {
-  width: 100%;
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
@@ -2247,11 +2505,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   min-height: 40px;
   justify-content: center;
   white-space: nowrap;
-}
-
-.layout-mobile .prism-inline-spotlight .play-button {
-  flex: 1 1 auto;
-  text-align: center;
 }
 
 .layout-mobile .prism-inline-spotlight .arrow-button {
@@ -2341,7 +2594,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   }
 
   html:not(.layout-tv) #slides-container .button-container {
-    width: 100%;
     gap: 0.5rem;
     margin-top: 0.75rem;
   }
@@ -2353,11 +2605,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
     min-height: 40px;
     justify-content: center;
     white-space: nowrap;
-  }
-
-  html:not(.layout-tv) #slides-container .play-button {
-    flex: 1 1 auto;
-    text-align: center;
   }
 
   html:not(.layout-tv) #slides-container .arrow-button {
@@ -2424,7 +2671,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   }
 
   html:not(.layout-tv) .prism-inline-spotlight .button-container {
-    width: 100%;
     gap: 0.5rem;
     margin-top: 0.75rem;
   }
@@ -2438,11 +2684,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
     white-space: nowrap;
   }
 
-  html:not(.layout-tv) .prism-inline-spotlight .play-button {
-    flex: 1 1 auto;
-    text-align: center;
-  }
-
   html:not(.layout-tv) .prism-inline-spotlight .arrow-button {
     display: none;
   }
@@ -2454,6 +2695,19 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
     width: 100%;
     justify-content: center;
     margin-top: 0.85rem;
+  }
+}
+
+@media (max-width: 640px) {
+  html:not(.layout-tv) #slides-container .button-container,
+  html:not(.layout-tv) .prism-inline-spotlight .button-container {
+    width: 100%;
+  }
+
+  html:not(.layout-tv) #slides-container .play-button,
+  html:not(.layout-tv) .prism-inline-spotlight .play-button {
+    flex: 1 1 auto;
+    text-align: center;
   }
 }
 
@@ -2824,21 +3078,23 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   padding-top: 0.5rem;
 }
 
-.layout-mobile .mainDetailButtons {
-  width: 100%;
-}
-
 .layout-mobile .mainDetailButtons .btnPlay,
 .layout-mobile .mainDetailButtons .btnResume {
-  flex: 1 1 100%;
   justify-content: center;
-  min-height: 46px;
-  font-size: 0.95rem;
+  min-height: 44px;
 }
 
-.layout-mobile .listItem {
+.layout-mobile .listItem:not(.actionSheetMenuItem):not(.listItem-button) {
   min-height: 4.5rem;
   padding: 0.55rem 0.7rem;
+}
+
+.layout-mobile .actionSheet .listItem,
+.layout-mobile .actionSheetMenuItem,
+.layout-mobile .dialog .listItem.listItem-button,
+.layout-mobile .mainDrawer .listItem {
+  min-height: 2.75rem !important;
+  padding: 0.5rem 0.75rem !important;
 }
 
 .layout-mobile .listItemImage-large {
@@ -2858,11 +3114,16 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
     -webkit-overflow-scrolling: touch;
   }
 
+  .mainDetailButtons {
+    width: 100%;
+  }
+
   .mainDetailButtons .btnPlay,
   .mainDetailButtons .btnResume {
     flex: 1 1 100%;
     justify-content: center;
     min-height: 46px;
+    font-size: 0.95rem;
   }
 }
 

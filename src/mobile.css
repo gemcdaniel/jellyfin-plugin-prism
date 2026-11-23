@@ -97,21 +97,23 @@
   padding-top: 0.5rem;
 }
 
-.layout-mobile .mainDetailButtons {
-  width: 100%;
-}
-
 .layout-mobile .mainDetailButtons .btnPlay,
 .layout-mobile .mainDetailButtons .btnResume {
-  flex: 1 1 100%;
   justify-content: center;
-  min-height: 46px;
-  font-size: 0.95rem;
+  min-height: 44px;
 }
 
-.layout-mobile .listItem {
+.layout-mobile .listItem:not(.actionSheetMenuItem):not(.listItem-button) {
   min-height: 4.5rem;
   padding: 0.55rem 0.7rem;
+}
+
+.layout-mobile .actionSheet .listItem,
+.layout-mobile .actionSheetMenuItem,
+.layout-mobile .dialog .listItem.listItem-button,
+.layout-mobile .mainDrawer .listItem {
+  min-height: 2.75rem !important;
+  padding: 0.5rem 0.75rem !important;
 }
 
 .layout-mobile .listItemImage-large {
@@ -131,11 +133,16 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  .mainDetailButtons {
+    width: 100%;
+  }
+
   .mainDetailButtons .btnPlay,
   .mainDetailButtons .btnResume {
     flex: 1 1 100%;
     justify-content: center;
     min-height: 46px;
+    font-size: 0.95rem;
   }
 }
 
