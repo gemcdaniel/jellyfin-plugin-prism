@@ -350,6 +350,8 @@ test('CSS styles sleek menu rows, full-card selection ring with circular checkbo
   assert.ok(cardsCss.includes('.card .cardOverlayButton-br:not(.flex) [data-action="play"]'));
   assert.ok(cardsCss.includes('.homeSectionsContainer .sectionTitle.padded-left'));
   assert.ok(cardsCss.includes('html.layout-mobile .card:not(:focus-within) .cardOverlayContainer'));
+  assert.ok(cardsCss.includes('html.layout-mobile .card:not(:focus-within) .cardOverlayButton-br[data-action="play"]'));
+  assert.ok(cardsCss.includes('html.layout-mobile .card:not(:focus-within) .cardOverlayButton-br:not(.flex) [data-action="play"]'));
   assert.ok(cardsCss.includes('.cardBox .itemSelectionPanel .multiSelectCheckboxOutline'));
   assert.ok(cardsCss.includes('.card:has(.chkItemSelect:checked) .cardBox'));
   assert.ok(bundledCss.includes('.itemSelectionPanel'));

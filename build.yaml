@@ -1,7 +1,7 @@
 ---
 name: "Prism"
 guid: "d8a4b2e1-7c3f-4e92-9b14-6f2c8d5a1e03"
-version: "1.0.5.0"
+version: "1.0.6.0"
 targetAbi: "12.4.0.0"
 framework: "net10.0"
 overview: "Complete Jellyfin 12.4+ experience plugin featuring a true-black OLED UI, ClearLogo Hero Spotlight, New Releases, Thematic Picks, Personalized Hybrid Discovery, Native Watchlist integration, Library Infinite Scroll, optional TMDB background polling, and LG WebOS 60fps guardrails."
@@ -15,4 +15,4 @@ imageUrl: "https://raw.githubusercontent.com/gemcdaniel/jellyfin-plugin-prism/ma
 artifacts:
   - "Jellyfin.Plugin.Prism.dll"
 changelog: >
-  Fix mobile play overlay buttons on React Movies tab cards, align native and Prism Home section margins, and keep desktop OffsetAppBar compact without extra top spacer height.
+  Hide mobile card play overlay buttons at rest so artwork stays visible until hovered or focused.

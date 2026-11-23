@@ -957,7 +957,7 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   border: 1px solid rgba(255, 255, 255, 0.28) !important;
   box-shadow: 0 8px 24px rgba(124, 92, 255, 0.55), 0 0 18px rgba(0, 212, 255, 0.3) !important;
   transform: translate(-50%, -50%) !important;
-  transition: transform 180ms var(--prism-ease), box-shadow 180ms var(--prism-ease);
+  transition: transform 180ms var(--prism-ease), box-shadow 180ms var(--prism-ease), opacity 180ms var(--prism-ease);
   z-index: 2;
 }
 
@@ -1049,13 +1049,40 @@ html[dir="rtl"] .card .cardOverlayButton-br:not(.flex) [data-action="menu"] {
   opacity: 1;
 }
 
-html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
+html.layout-mobile .card:not(:focus-within) .cardOverlayContainer,
+html.layout-mobile .card:not(:focus-within) .cardOverlayFab-primary,
+html.layout-mobile .card:not(:focus-within) .cardOverlayButton-br[data-action="play"],
+html.layout-mobile .card:not(:focus-within) .cardOverlayButton-br[data-action="resume"],
+html.layout-mobile .card:not(:focus-within) .cardOverlayButton-br:not(.flex) [data-action="play"],
+html.layout-mobile .card:not(:focus-within) .cardOverlayButton-br:not(.flex) [data-action="resume"],
+html.layout-mobile .card:not(:focus-within) .cardOverlayButton-centered {
   opacity: 0 !important;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  html.layout-mobile .card:hover .cardOverlayContainer,
+  html.layout-mobile .card:hover .cardOverlayFab-primary,
+  html.layout-mobile .card:hover .cardOverlayButton-br[data-action="play"],
+  html.layout-mobile .card:hover .cardOverlayButton-br[data-action="resume"],
+  html.layout-mobile .card:hover .cardOverlayButton-br:not(.flex) [data-action="play"],
+  html.layout-mobile .card:hover .cardOverlayButton-br:not(.flex) [data-action="resume"],
+  html.layout-mobile .card:hover .cardOverlayButton-centered {
+    opacity: 1 !important;
+    pointer-events: auto;
+  }
 }
 
 @media (hover: none) {
-  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayContainer {
+  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayContainer,
+  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayFab-primary,
+  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayButton-br[data-action="play"],
+  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayButton-br[data-action="resume"],
+  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayButton-br:not(.flex) [data-action="play"],
+  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayButton-br:not(.flex) [data-action="resume"],
+  html:not(.layout-tv) .card:not(:focus-within) .cardOverlayButton-centered {
     opacity: 0 !important;
+    pointer-events: none;
   }
 }
 
