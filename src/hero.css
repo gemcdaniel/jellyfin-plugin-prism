@@ -18,6 +18,11 @@
   height: clamp(440px, 66vh, 690px);
 }
 
+html.prism-home-route.prism-hero-page:not(.layout-tv) .homePage.libraryPage,
+html.prism-home-route.prism-hero-page:not(.layout-tv) #indexPage.libraryPage {
+  padding-top: 0 !important;
+}
+
 #slides-container .slide {
   position: relative;
   width: 100%;

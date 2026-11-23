@@ -343,9 +343,12 @@ test('CSS styles sleek menu rows, full-card selection ring with circular checkbo
 
   assert.ok(baseCss.includes('.actionSheetMenuItem'));
   assert.ok(baseCss.includes('.MuiMenu-paper .MuiMenuItem-root'));
+  assert.ok(baseCss.includes('html.prism-hero-page:not(.layout-tv) .MuiAppBar-root + div[aria-hidden="true"]'));
   assert.ok(mobileCss.includes('.layout-mobile .listItem:not(.actionSheetMenuItem):not(.listItem-button)'));
   assert.ok(cardsCss.includes('.card .cardOverlayFab-primary'));
   assert.ok(cardsCss.includes('.card .cardOverlayButton-br[data-action="play"]'));
+  assert.ok(cardsCss.includes('.card .cardOverlayButton-br:not(.flex) [data-action="play"]'));
+  assert.ok(cardsCss.includes('.homeSectionsContainer .sectionTitle.padded-left'));
   assert.ok(cardsCss.includes('html.layout-mobile .card:not(:focus-within) .cardOverlayContainer'));
   assert.ok(cardsCss.includes('.cardBox .itemSelectionPanel .multiSelectCheckboxOutline'));
   assert.ok(cardsCss.includes('.card:has(.chkItemSelect:checked) .cardBox'));

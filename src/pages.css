@@ -22,6 +22,16 @@
   background-color: var(--prism-bg);
 }
 
+@supports selector(:has(*)) {
+  html.prism-hero-page:not(.layout-tv) body:has(.MuiAppBar-root) .prism-detail-backdrop {
+    top: 0;
+  }
+
+  body:has(.MuiAppBar-root + div[aria-hidden="true"]) .libraryPage:not(.homePage) {
+    padding-top: 1.25rem !important;
+  }
+}
+
 .prism-detail-backdrop img {
   width: 100%;
   height: 100%;

@@ -11,13 +11,27 @@
   margin-bottom: 0.65rem !important;
 }
 
+.sectionTitleContainer,
+.homeSectionsContainer .sectionTitle.padded-left,
+.homeSectionsContainer .padded-left:not(.sectionTitleTextButton) {
+  padding-inline: max(var(--prism-gutter), env(safe-area-inset-left)) max(var(--prism-gutter), env(safe-area-inset-right)) !important;
+}
+
 .sectionTitleContainer {
-  padding-inline: var(--prism-gutter);
   padding-top: 0.25rem !important;
   padding-bottom: 0.15rem !important;
   margin-bottom: 0.3rem !important;
   display: flex;
   align-items: center;
+}
+
+.sectionTitleContainer .padded-left {
+  padding-inline-start: 0 !important;
+}
+
+.homeSectionsContainer .sectionTitle.padded-left {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.3rem !important;
 }
 
 .sectionTitle {
@@ -88,10 +102,22 @@
   transition: opacity 180ms var(--prism-ease);
 }
 
+/* Neutralize React ButtonGroup wrapper on mobile cards so play centers on card and menu anchors in corner */
+.card .cardScalable > a > .cardOverlayButton-br,
+.card div.cardOverlayButton-br:not(.flex) {
+  position: static !important;
+  inset: auto !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 /* Center overlay play button cleanly across native, injected, and mobile cards */
 .card .cardOverlayFab-primary,
 .card .cardOverlayButton-br[data-action="play"],
 .card .cardOverlayButton-br[data-action="resume"],
+.card .cardOverlayButton-br:not(.flex) [data-action="play"],
+.card .cardOverlayButton-br:not(.flex) [data-action="resume"],
 .card .cardOverlayButton-centered {
   position: absolute !important;
   top: 50% !important;
@@ -119,7 +145,12 @@
 
 .card .cardOverlayButton-br[data-action="play"] .cardOverlayButtonIcon,
 .card .cardOverlayButton-br[data-action="resume"] .cardOverlayButtonIcon,
-.card .cardOverlayButton-centered .cardOverlayButtonIcon {
+.card .cardOverlayButton-br:not(.flex) [data-action="play"] .cardOverlayButtonIcon,
+.card .cardOverlayButton-br:not(.flex) [data-action="play"] .MuiSvgIcon-root,
+.card .cardOverlayButton-br:not(.flex) [data-action="resume"] .cardOverlayButtonIcon,
+.card .cardOverlayButton-br:not(.flex) [data-action="resume"] .MuiSvgIcon-root,
+.card .cardOverlayButton-centered .cardOverlayButtonIcon,
+.card .cardOverlayButton-centered .MuiSvgIcon-root {
   background: transparent !important;
   background-color: transparent !important;
   width: auto !important;
@@ -128,7 +159,9 @@
   color: #FFFFFF !important;
 }
 
-.card .cardOverlayButton-br[data-action="menu"] {
+.card .cardOverlayButton-br[data-action="menu"],
+.card .cardOverlayButton-br:not(.flex) [data-action="menu"] {
+  position: absolute !important;
   bottom: 0.35rem !important;
   right: 0.35rem !important;
   padding: 0 !important;
@@ -136,25 +169,35 @@
   height: 34px !important;
   min-width: 34px !important;
   min-height: 34px !important;
+  border: none !important;
+  border-radius: var(--prism-radius-pill) !important;
+  background-color: rgba(8, 10, 16, 0.82) !important;
+  color: var(--prism-text) !important;
+  z-index: 2;
 }
 
-html[dir="rtl"] .card .cardOverlayButton-br[data-action="menu"] {
+html[dir="rtl"] .card .cardOverlayButton-br[data-action="menu"],
+html[dir="rtl"] .card .cardOverlayButton-br:not(.flex) [data-action="menu"] {
   right: auto !important;
   left: 0.35rem !important;
 }
 
-.card .cardOverlayButton-br[data-action="menu"] .cardOverlayButtonIcon {
-  background-color: rgba(8, 10, 16, 0.82) !important;
-  border: 1px solid var(--prism-border) !important;
+.card .cardOverlayButton-br[data-action="menu"] .cardOverlayButtonIcon,
+.card .cardOverlayButton-br:not(.flex) [data-action="menu"] .cardOverlayButtonIcon,
+.card .cardOverlayButton-br:not(.flex) [data-action="menu"] .MuiSvgIcon-root {
+  background-color: transparent !important;
+  border: none !important;
   color: var(--prism-text) !important;
-  width: 30px !important;
-  height: 30px !important;
+  width: auto !important;
+  height: auto !important;
   font-size: 1.15rem !important;
 }
 
 .card .cardOverlayFab-primary:hover,
 .card .cardOverlayButton-br[data-action="play"]:hover,
 .card .cardOverlayButton-br[data-action="resume"]:hover,
+.card .cardOverlayButton-br:not(.flex) [data-action="play"]:hover,
+.card .cardOverlayButton-br:not(.flex) [data-action="resume"]:hover,
 .card .cardOverlayButton-centered:hover {
   transform: translate(-50%, -50%) scale(1.08) !important;
   box-shadow: 0 10px 28px rgba(124, 92, 255, 0.65), 0 0 22px rgba(0, 212, 255, 0.45) !important;
@@ -442,12 +485,18 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
   line-height: 1.3;
 }
 
-/* Scroller Padding (extra vertical/inline room so hover glow isn't clipped) */
+/* Scroller Padding (extra vertical/inline room so hover glow isn't clipped & native/plugin align) */
 .emby-scroller,
 .prism-scroller {
-  padding-inline: var(--prism-gutter);
+  padding-inline: max(var(--prism-gutter), env(safe-area-inset-left)) max(var(--prism-gutter), env(safe-area-inset-right)) !important;
   padding-top: 0.35rem;
   padding-bottom: 0.35rem;
+}
+
+.emby-scroller .itemsContainer > .card:first-child > .cardBox,
+.prism-scroller .prism-items-container > .card:first-child > .cardBox,
+.prism-scroller .prism-items-container > .prism-theme-tile:first-child {
+  margin-inline-start: 0 !important;
 }
 
 /* Hide horizontal scrollbars on injected rows to match native Jellyfin carousels */

@@ -47,9 +47,29 @@ body {
   background-image: none !important;
   border-bottom: none !important;
   color: var(--prism-text) !important;
-  min-height: var(--prism-header-height);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
   transition: background-color 220ms var(--prism-ease), box-shadow 220ms var(--prism-ease);
+}
+
+.skinHeader,
+.skinHeader.semiTransparent,
+.skinHeader-withBackground {
+  min-height: var(--prism-header-height);
+}
+
+/* Keep MUI OffsetAppBar dense instead of inflating its aria-hidden layout spacer */
+.MuiAppBar-root {
+  min-height: 0 !important;
+}
+
+.MuiAppBar-root .MuiToolbar-root {
+  min-height: 48px !important;
+}
+
+/* Collapse OffsetAppBar's in-flow spacer when Hero/Detail full-bleed backdrop sits behind fixed AppBar */
+html.prism-hero-page:not(.layout-tv) .MuiAppBar-root + div[aria-hidden="true"] {
+  height: 0 !important;
+  min-height: 0 !important;
 }
 
 .skinHeader.semiTransparent {
