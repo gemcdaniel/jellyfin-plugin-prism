@@ -122,18 +122,6 @@
     state.badgeScanTimer = window.setTimeout(scanNativeCardsForBadges, 180);
   }
 
-  function installCardHoverRule() {
-    if (document.getElementById('prism-js-helpers')) return;
-    var style = document.createElement('style');
-    style.id = 'prism-js-helpers';
-    style.textContent =
-      '.prism-home-section .card:hover .cardOverlayContainer,' +
-      '.prism-home-section .card:focus-within .cardOverlayContainer,' +
-      '.card[data-prism-lib-card="1"]:hover .cardOverlayContainer,' +
-      '.card[data-prism-lib-card="1"]:focus-within .cardOverlayContainer{opacity:1 !important;}';
-    document.head.appendChild(style);
-  }
-
   function removeInjectedHomeDom(activeHome) {
     if (!activeHome) return;
     if (activeHome.page) {
@@ -256,7 +244,6 @@
   }
 
   function bootstrap() {
-    installCardHoverRule();
     ensureBackdropLeakFix();
     initDashboardBackButtonFix();
     initTvGuideScrollFix();

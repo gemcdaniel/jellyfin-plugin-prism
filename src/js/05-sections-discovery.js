@@ -155,37 +155,57 @@
         '</button>';
     }
 
-    var cardClass = isThumb
-      ? 'card overflowBackdropCard prism-card-thumb card-hoverable card-withuserdata'
-      : 'card overflowPortraitCard card-hoverable card-withuserdata';
-    var padderClass = isThumb
-      ? 'cardPadder cardPadder-overflowBackdrop'
-      : 'cardPadder cardPadder-overflowPortrait';
+    return buildMediaCardHtml({
+      id: item.Id,
+      name: item.Name,
+      imgUrl: imgUrl,
+      cardClass: isThumb
+        ? 'card overflowBackdropCard prism-card-thumb card-hoverable card-withuserdata'
+        : 'card overflowPortraitCard card-hoverable card-withuserdata',
+      cardAttrs: 'data-prism-item-id="' + escapeHtml(item.Id) + '" style="flex:0 0 auto;"',
+      padderClass: isThumb
+        ? 'cardPadder cardPadder-overflowBackdrop'
+        : 'cardPadder cardPadder-overflowPortrait',
+      extraScalableHtml: renderBadgePillsHtml(item.Badges) + wlBtnHtml,
+      secondaryHtml: secondaryText
+    });
+  }
 
+  function buildScrollerSectionHtml(section, itemsHtml) {
     return (
-      '<div class="' + cardClass + '" tabindex="0" data-prism-item-id="' + escapeHtml(item.Id) + '" style="flex:0 0 auto;">' +
-        '<div class="cardBox cardBox-bottompadded">' +
-          '<div class="cardScalable">' +
-            '<div class="' + padderClass + '"></div>' +
-            '<div class="cardContent">' +
-              '<div class="cardImageContainer coveredImage" style="background-image:url(\'' + escapeHtml(imgUrl) + '\');">' +
-                '<div><img src="' + escapeHtml(imgUrl) + '" alt="' + escapeHtml(item.Name) + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>' +
-              '</div>' +
-            '</div>' +
-            renderBadgePillsHtml(item.Badges) +
-            wlBtnHtml +
-            '<div class="cardOverlayContainer itemAction" style="position:absolute;inset:0;opacity:0;">' +
-              '<a class="cardImageContainer" href="#/details?id=' + escapeHtml(item.Id) + '" aria-label="' + escapeHtml(item.Name) + '" style="position:absolute;inset:0;"></a>' +
-              '<button type="button" class="cardOverlayFab-primary" aria-label="Play" style="z-index:2;width:52px;height:52px;padding:0;line-height:1;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true" style="display:block;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg></button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="cardFooter">' +
-            '<div class="cardText cardText-first">' + escapeHtml(item.Name) + '</div>' +
-            '<div class="cardText cardText-secondary">' + secondaryText + '</div>' +
-          '</div>' +
+      '<div class="sectionTitleContainer sectionTitleContainer-cards prism-section-header">' +
+        '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:0.35rem;">' +
+          '<h2 class="sectionTitle sectionTitle-cards">' + escapeHtml(section.Title) + '</h2>' +
+          (section.Badge ? '<span class="prism-section-pill">' + escapeHtml(section.Badge) + '</span>' : '') +
+        '</div>' +
+        '<div class="prism-scroll-nav">' +
+          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="-1" aria-label="Scroll left">&#8249;</button>' +
+          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="1" aria-label="Scroll right">&#8250;</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="prism-scroller" data-horizontal="true" style="overflow-x:auto;overflow-y:visible;">' +
+        '<div class="scrollSlider prism-items-container focuscontainer-x" style="display:flex;flex-wrap:nowrap;">' +
+          itemsHtml +
         '</div>' +
       '</div>'
     );
+  }
+
+  function handleSectionScrollClick(sectionEl, e) {
+    var scrollBtn = e.target && e.target.closest ? e.target.closest('[data-prism-scroll]') : null;
+    if (!scrollBtn) return false;
+    e.preventDefault();
+    var scroller = sectionEl.querySelector('.prism-scroller');
+    if (scroller) {
+      var dir = Number(scrollBtn.getAttribute('data-prism-scroll')) || 1;
+      var delta = dir * Math.max(320, scroller.clientWidth * 0.8);
+      if (typeof scroller.scrollBy === 'function') {
+        scroller.scrollBy({ left: delta, behavior: 'smooth' });
+      } else {
+        scroller.scrollLeft += delta;
+      }
+    }
+    return true;
   }
 
   function renderThematicGridSection(section) {
@@ -214,36 +234,10 @@
         '</div>';
     }
 
-    el.innerHTML =
-      '<div class="sectionTitleContainer sectionTitleContainer-cards prism-section-header">' +
-        '<div style="display:flex;align-items:center;">' +
-          '<h2 class="sectionTitle sectionTitle-cards">' + escapeHtml(section.Title) + '</h2>' +
-          (section.Badge ? '<span class="prism-section-pill">' + escapeHtml(section.Badge) + '</span>' : '') +
-        '</div>' +
-        '<div class="prism-scroll-nav">' +
-          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="-1" aria-label="Scroll left">&#8249;</button>' +
-          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="1" aria-label="Scroll right">&#8250;</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="prism-scroller" data-horizontal="true" style="overflow-x:auto;overflow-y:visible;">' +
-        '<div class="scrollSlider prism-items-container focuscontainer-x" style="display:flex;flex-wrap:nowrap;">' +
-          tilesHtml +
-        '</div>' +
-      '</div>';
+    el.innerHTML = buildScrollerSectionHtml(section, tilesHtml);
 
     el.addEventListener('click', function (e) {
-      var scrollBtn = e.target && e.target.closest ? e.target.closest('[data-prism-scroll]') : null;
-      if (scrollBtn) {
-        e.preventDefault();
-        var scroller = el.querySelector('.prism-scroller');
-        if (scroller) {
-          var dir = Number(scrollBtn.getAttribute('data-prism-scroll')) || 1;
-          var delta = dir * Math.max(320, scroller.clientWidth * 0.8);
-          if (typeof scroller.scrollBy === 'function') scroller.scrollBy({ left: delta, behavior: 'smooth' });
-          else scroller.scrollLeft += delta;
-        }
-        return;
-      }
+      if (handleSectionScrollClick(el, e)) return;
       var tileEl = e.target && e.target.closest ? e.target.closest('[data-prism-theme-id]') : null;
       if (tileEl) {
         e.preventDefault();
@@ -282,22 +276,7 @@
       cardsHtml += renderPosterOrThumbCardHtml(section.Items[i], section.CardFormat);
     }
 
-    el.innerHTML =
-      '<div class="sectionTitleContainer sectionTitleContainer-cards prism-section-header">' +
-        '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:0.2rem;">' +
-          '<h2 class="sectionTitle sectionTitle-cards">' + escapeHtml(section.Title) + '</h2>' +
-          (section.Badge ? '<span class="prism-section-pill">' + escapeHtml(section.Badge) + '</span>' : '') +
-        '</div>' +
-        '<div class="prism-scroll-nav">' +
-          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="-1" aria-label="Scroll left">&#8249;</button>' +
-          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="1" aria-label="Scroll right">&#8250;</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="prism-scroller" data-horizontal="true" style="overflow-x:auto;overflow-y:visible;">' +
-        '<div class="scrollSlider prism-items-container focuscontainer-x" style="display:flex;flex-wrap:nowrap;">' +
-          cardsHtml +
-        '</div>' +
-      '</div>';
+    el.innerHTML = buildScrollerSectionHtml(section, cardsHtml);
 
     el.addEventListener('click', function (e) {
       var wlBtn = e.target && e.target.closest ? e.target.closest('.prism-card-wl-btn') : null;
@@ -308,21 +287,7 @@
         return;
       }
 
-      var scrollBtn = e.target && e.target.closest ? e.target.closest('[data-prism-scroll]') : null;
-      if (scrollBtn) {
-        e.preventDefault();
-        var scroller = el.querySelector('.prism-scroller');
-        if (scroller) {
-          var dir = Number(scrollBtn.getAttribute('data-prism-scroll')) || 1;
-          var delta = dir * Math.max(320, scroller.clientWidth * 0.8);
-          if (typeof scroller.scrollBy === 'function') {
-            scroller.scrollBy({ left: delta, behavior: 'smooth' });
-          } else {
-            scroller.scrollLeft += delta;
-          }
-        }
-        return;
-      }
+      if (handleSectionScrollClick(el, e)) return;
 
       var card = e.target && e.target.closest ? e.target.closest('[data-prism-item-id]') : null;
       if (card) {
@@ -349,12 +314,8 @@
     if (existing && existing.parentNode) {
       existing.parentNode.removeChild(existing);
     }
-    if (restoreFocusEl && typeof restoreFocusEl.focus === 'function' && document.body.contains(restoreFocusEl)) {
-      try {
-        restoreFocusEl.focus({ preventScroll: true });
-      } catch (_) {
-        restoreFocusEl.focus();
-      }
+    if (restoreFocusEl && document.body.contains(restoreFocusEl)) {
+      focusWithoutScroll(restoreFocusEl);
     }
   }
 
@@ -605,11 +566,7 @@
       if (fromUserTrigger && isTvLayout() && firstNewSection) {
         var focusTarget = firstNewSection.querySelector('.card, .play-button, .prism-theme-tile');
         if (focusTarget) {
-          try {
-            focusTarget.focus({ preventScroll: true });
-          } catch (_) {
-            focusTarget.focus();
-          }
+          focusWithoutScroll(focusTarget);
         }
       }
     }).catch(function () {

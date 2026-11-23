@@ -197,28 +197,15 @@
 
     var yearText = item.ProductionYear ? String(item.ProductionYear) : '';
 
-    return (
-      '<div class="card ' + cardShape + ' card-hoverable card-withuserdata" tabindex="0" data-prism-lib-card="1" data-id="' + escapeHtml(item.Id) + '" data-type="' + escapeHtml(item.Type || itemType) + '">' +
-        '<div class="cardBox cardBox-bottompadded">' +
-          '<div class="cardScalable">' +
-            '<div class="' + padderClass + '"></div>' +
-            '<div class="cardContent">' +
-              '<div class="cardImageContainer coveredImage" style="background-image:url(\'' + escapeHtml(imgUrl) + '\');">' +
-                '<div><img src="' + escapeHtml(imgUrl) + '" alt="' + escapeHtml(item.Name) + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="cardOverlayContainer itemAction" style="position:absolute;inset:0;opacity:0;">' +
-              '<a class="cardImageContainer" href="#/details?id=' + escapeHtml(item.Id) + '" aria-label="' + escapeHtml(item.Name) + '" style="position:absolute;inset:0;"></a>' +
-              '<button type="button" class="cardOverlayFab-primary" aria-label="Play" style="z-index:2;width:52px;height:52px;padding:0;line-height:1;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true" style="display:block;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg></button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="cardFooter">' +
-            '<div class="cardText cardText-first">' + escapeHtml(item.Name) + '</div>' +
-            '<div class="cardText cardText-secondary">' + escapeHtml(yearText) + '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>'
-    );
+    return buildMediaCardHtml({
+      id: item.Id,
+      name: item.Name,
+      imgUrl: imgUrl,
+      cardClass: 'card ' + cardShape + ' card-hoverable card-withuserdata',
+      cardAttrs: 'data-prism-lib-card="1" data-id="' + escapeHtml(item.Id) + '" data-type="' + escapeHtml(item.Type || itemType) + '"',
+      padderClass: padderClass,
+      secondaryHtml: escapeHtml(yearText)
+    });
   }
 
   function loadNextLibraryBatch(fromUserTrigger) {
@@ -297,11 +284,7 @@
         scheduleNativeBadgeScan();
 
         if (fromUserTrigger && isTvLayout() && firstAdded) {
-          try {
-            firstAdded.focus({ preventScroll: true });
-          } catch (_) {
-            firstAdded.focus();
-          }
+          focusWithoutScroll(firstAdded);
         }
       }
 

@@ -215,6 +215,65 @@
     }, true);
   }
 
+  function renderSpotlightActionButtons(btnWrap, item) {
+    var wlHtml = '';
+    if (state.config.enableWatchlist) {
+      var isWl = isItemWatchlisted(item.Id);
+      wlHtml =
+        '<button type="button" class="detail-button prism-watchlist-btn' + (isWl ? ' is-active' : '') + '" data-prism-wl-id="' + escapeHtml(normalizeItemId(item.Id)) + '" aria-pressed="' + (isWl ? 'true' : 'false') + '">' +
+          renderWatchlistSvg(isWl) +
+          '<span>' + (isWl ? 'In Watchlist' : 'Watchlist') + '</span>' +
+        '</button>';
+    }
+
+    btnWrap.innerHTML =
+      '<button type="button" class="play-button"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
+      '<button type="button" class="detail-button">Details</button>' +
+      wlHtml;
+
+    var playBtn = btnWrap.querySelector('.play-button');
+    var detailBtn = btnWrap.querySelector('.detail-button:not(.prism-watchlist-btn)');
+    var wlBtn = btnWrap.querySelector('.prism-watchlist-btn');
+    if (playBtn) playBtn.addEventListener('click', function () { navigateToItem(item.Id); });
+    if (detailBtn) detailBtn.addEventListener('click', function () { navigateToItem(item.Id); });
+    if (wlBtn) {
+      wlBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleWatchlistItem(item.Id);
+      });
+    }
+  }
+
+  function renderSpotlightDots(dotsEl, count, activeIndex) {
+    var dotsHtml = '';
+    for (var i = 0; i < count; i += 1) {
+      dotsHtml += '<button type="button" tabindex="-1" class="dot ' + (i === activeIndex ? 'active' : '') + '" data-slide-idx="' + i + '" aria-label="Slide ' + (i + 1) + '"></button>';
+    }
+    dotsEl.innerHTML = dotsHtml;
+  }
+
+  function bindSpotlightNavigation(targetEl, prevBtn, nextBtn, dotsEl, opts) {
+    prevBtn.addEventListener('click', opts.onPrev);
+    nextBtn.addEventListener('click', opts.onNext);
+    dotsEl.addEventListener('click', function (e) {
+      var dot = e.target && e.target.closest ? e.target.closest('[data-slide-idx]') : null;
+      if (dot) opts.onSelect(Number(dot.getAttribute('data-slide-idx')));
+    });
+
+    targetEl.addEventListener('mouseenter', function () { opts.onPauseHover(true); });
+    targetEl.addEventListener('mouseleave', function () { opts.onPauseHover(false); });
+    targetEl.addEventListener('focusin', function () { opts.onPauseHover(true); });
+    targetEl.addEventListener('focusout', function () { opts.onPauseHover(false); });
+
+    attachSwipeHandlers(targetEl, {
+      getCount: opts.getCount,
+      onNext: opts.onNext,
+      onPrev: opts.onPrev,
+      onPauseChange: opts.onPauseTouch
+    });
+  }
+
   function renderHeroSpotlight(hostPage, heroItems) {
     if (!state.config.enableHeroSpotlight || !heroItems || heroItems.length === 0) {
       return;
@@ -326,40 +385,8 @@
         renderLogoOrTitle(logoEl, item, 'h2');
         infoEl.innerHTML = buildPillsHtml(item);
         plotEl.textContent = item.Overview || '';
-
-        var wlHtml = '';
-        if (state.config.enableWatchlist) {
-          var isWl = isItemWatchlisted(item.Id);
-          wlHtml =
-            '<button type="button" class="detail-button prism-watchlist-btn' + (isWl ? ' is-active' : '') + '" data-prism-wl-id="' + escapeHtml(normalizeItemId(item.Id)) + '" aria-pressed="' + (isWl ? 'true' : 'false') + '">' +
-              renderWatchlistSvg(isWl) +
-              '<span>' + (isWl ? 'In Watchlist' : 'Watchlist') + '</span>' +
-            '</button>';
-        }
-
-        btnWrap.innerHTML =
-          '<button type="button" class="play-button" style="display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
-          '<button type="button" class="detail-button">Details</button>' +
-          wlHtml;
-
-        var playBtn = btnWrap.querySelector('.play-button');
-        var detailBtn = btnWrap.querySelector('.detail-button:not(.prism-watchlist-btn)');
-        var wlBtn = btnWrap.querySelector('.prism-watchlist-btn');
-        if (playBtn) playBtn.addEventListener('click', function () { navigateToItem(item.Id); });
-        if (detailBtn) detailBtn.addEventListener('click', function () { navigateToItem(item.Id); });
-        if (wlBtn) {
-          wlBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleWatchlistItem(item.Id);
-          });
-        }
-
-        var dotsHtml = '';
-        for (var i = 0; i < heroItems.length; i += 1) {
-          dotsHtml += '<button type="button" tabindex="-1" class="dot ' + (i === state.slideIndex ? 'active' : '') + '" data-slide-idx="' + i + '" aria-label="Slide ' + (i + 1) + '"></button>';
-        }
-        dotsEl.innerHTML = dotsHtml;
+        renderSpotlightActionButtons(btnWrap, item);
+        renderSpotlightDots(dotsEl, heroItems.length, state.slideIndex);
 
         applyAmbientColorForUrl('hero-' + item.Id, buildImageUrl(item.Id, 'Backdrop', 64, item.BackdropImageTag, 0));
       }
@@ -367,11 +394,16 @@
       scheduleNextHeroTick();
     }
 
-    prevBtn.addEventListener('click', function () { drawSlide(state.slideIndex - 1, 0); });
-    nextBtn.addEventListener('click', function () { drawSlide(state.slideIndex + 1, 0); });
-    dotsEl.addEventListener('click', function (e) {
-      var dot = e.target && e.target.closest ? e.target.closest('[data-slide-idx]') : null;
-      if (dot) drawSlide(Number(dot.getAttribute('data-slide-idx')), 0);
+    bindSpotlightNavigation(wrapper, prevBtn, nextBtn, dotsEl, {
+      getCount: function () { return heroItems.length; },
+      onPrev: function () { drawSlide(state.slideIndex - 1, 0); },
+      onNext: function () { drawSlide(state.slideIndex + 1, 0); },
+      onSelect: function (idx) { drawSlide(idx, 0); },
+      onPauseHover: function (p) { paused = p; },
+      onPauseTouch: function (p) {
+        touchPaused = p;
+        if (!p) paused = false;
+      }
     });
 
     wrapper.addEventListener('keydown', function (e) {
@@ -427,21 +459,6 @@
         e.preventDefault();
         e.stopPropagation();
         focusables[idx - 1].focus();
-      }
-    });
-
-    wrapper.addEventListener('mouseenter', function () { paused = true; });
-    wrapper.addEventListener('mouseleave', function () { paused = false; });
-    wrapper.addEventListener('focusin', function () { paused = true; });
-    wrapper.addEventListener('focusout', function () { paused = false; });
-
-    attachSwipeHandlers(wrapper, {
-      getCount: function () { return heroItems.length; },
-      onNext: function () { drawSlide(state.slideIndex + 1, 0); },
-      onPrev: function () { drawSlide(state.slideIndex - 1, 0); },
-      onPauseChange: function (p) {
-        touchPaused = p;
-        if (!p) paused = false;
       }
     });
 
@@ -540,61 +557,19 @@
       renderLogoOrTitle(logoEl, item, 'h3');
       infoEl.innerHTML = buildPillsHtml(item);
       plotEl.textContent = item.Overview || '';
-
-      var wlHtml = '';
-      if (state.config.enableWatchlist) {
-        var isWl = isItemWatchlisted(item.Id);
-        wlHtml =
-          '<button type="button" class="detail-button prism-watchlist-btn' + (isWl ? ' is-active' : '') + '" data-prism-wl-id="' + escapeHtml(normalizeItemId(item.Id)) + '" aria-pressed="' + (isWl ? 'true' : 'false') + '">' +
-            renderWatchlistSvg(isWl) +
-            '<span>' + (isWl ? 'In Watchlist' : 'Watchlist') + '</span>' +
-          '</button>';
-      }
-
-      btnWrap.innerHTML =
-        '<button type="button" class="play-button" style="display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
-        '<button type="button" class="detail-button">Details</button>' +
-        wlHtml;
-
-      var playBtn = btnWrap.querySelector('.play-button');
-      var detailBtn = btnWrap.querySelector('.detail-button:not(.prism-watchlist-btn)');
-      var wlBtn = btnWrap.querySelector('.prism-watchlist-btn');
-      if (playBtn) playBtn.addEventListener('click', function () { navigateToItem(item.Id); });
-      if (detailBtn) detailBtn.addEventListener('click', function () { navigateToItem(item.Id); });
-      if (wlBtn) {
-        wlBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleWatchlistItem(item.Id);
-        });
-      }
-
-      var dotsHtml = '';
-      for (var i = 0; i < items.length; i += 1) {
-        dotsHtml += '<button type="button" tabindex="-1" class="dot ' + (i === slideIdx ? 'active' : '') + '" data-slide-idx="' + i + '" aria-label="Slide ' + (i + 1) + '"></button>';
-      }
-      dotsEl.innerHTML = dotsHtml;
+      renderSpotlightActionButtons(btnWrap, item);
+      renderSpotlightDots(dotsEl, items.length, slideIdx);
 
       scheduleInlineTick();
     }
 
-    prevBtn.addEventListener('click', function () { drawInline(slideIdx - 1); });
-    nextBtn.addEventListener('click', function () { drawInline(slideIdx + 1); });
-    dotsEl.addEventListener('click', function (e) {
-      var dot = e.target && e.target.closest ? e.target.closest('[data-slide-idx]') : null;
-      if (dot) drawInline(Number(dot.getAttribute('data-slide-idx')));
-    });
-
-    stage.addEventListener('mouseenter', function () { paused = true; });
-    stage.addEventListener('mouseleave', function () { paused = false; });
-    stage.addEventListener('focusin', function () { paused = true; });
-    stage.addEventListener('focusout', function () { paused = false; });
-
-    attachSwipeHandlers(stage, {
+    bindSpotlightNavigation(stage, prevBtn, nextBtn, dotsEl, {
       getCount: function () { return items.length; },
-      onNext: function () { drawInline(slideIdx + 1); },
       onPrev: function () { drawInline(slideIdx - 1); },
-      onPauseChange: function (p) {
+      onNext: function () { drawInline(slideIdx + 1); },
+      onSelect: function (idx) { drawInline(idx); },
+      onPauseHover: function (p) { paused = p; },
+      onPauseTouch: function (p) {
         touchPaused = p;
         if (!p) paused = false;
       }

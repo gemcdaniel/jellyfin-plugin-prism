@@ -149,11 +149,7 @@
         if (document.activeElement === prevActive) {
           var nextCell = findAdjacentGuideCell(cell, direction);
           if (nextCell) {
-            try {
-              nextCell.focus({ preventScroll: true });
-            } catch (_) {
-              nextCell.focus();
-            }
+            focusWithoutScroll(nextCell);
             ensureGuideCellVisible(nextCell);
           }
         } else if (document.activeElement) {
@@ -199,11 +195,7 @@
     }
     var target = findFirstVisibleHomeTarget();
     if (target) {
-      try {
-        target.focus({ preventScroll: true });
-      } catch (_) {
-        target.focus();
-      }
+      focusWithoutScroll(target);
     }
   }
 
@@ -219,11 +211,7 @@
       var target = findFirstVisibleHomeTarget();
       if (target) {
         e.preventDefault();
-        try {
-          target.focus({ preventScroll: true });
-        } catch (_) {
-          target.focus();
-        }
+        focusWithoutScroll(target);
       }
     }, true);
   }

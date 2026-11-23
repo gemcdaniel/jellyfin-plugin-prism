@@ -345,9 +345,10 @@ test('CSS styles sleek menu rows, full-card selection ring with circular checkbo
   assert.ok(baseCss.includes('.MuiMenu-paper .MuiMenuItem-root'));
   assert.ok(mobileCss.includes('.layout-mobile .listItem:not(.actionSheetMenuItem):not(.listItem-button)'));
   assert.ok(cardsCss.includes('.card .cardOverlayFab-primary'));
+  assert.ok(cardsCss.includes('.card .cardOverlayButton-br[data-action="play"]'));
   assert.ok(cardsCss.includes('html.layout-mobile .card:not(:focus-within) .cardOverlayContainer'));
-  assert.ok(cardsCss.includes('.chkCardSelectContainer .checkboxOutline'));
-  assert.ok(cardsCss.includes('.card:has(.chkCardSelect:checked) .cardBox'));
+  assert.ok(cardsCss.includes('.cardBox .itemSelectionPanel .multiSelectCheckboxOutline'));
+  assert.ok(cardsCss.includes('.card:has(.chkItemSelect:checked) .cardBox'));
   assert.ok(bundledCss.includes('.itemSelectionPanel'));
 });
 

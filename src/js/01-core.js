@@ -261,3 +261,41 @@
     }
   }
 
+  function focusWithoutScroll(el) {
+    if (!el || typeof el.focus !== 'function') return;
+    try {
+      el.focus({ preventScroll: true });
+    } catch (_) {
+      el.focus();
+    }
+  }
+
+  function buildMediaCardHtml(opts) {
+    var idAttr = escapeHtml(opts.id);
+    var nameEsc = escapeHtml(opts.name);
+    var imgEsc = escapeHtml(opts.imgUrl);
+    return (
+      '<div class="' + opts.cardClass + '" tabindex="0" ' + opts.cardAttrs + '>' +
+        '<div class="cardBox cardBox-bottompadded">' +
+          '<div class="cardScalable">' +
+            '<div class="' + opts.padderClass + '"></div>' +
+            '<div class="cardContent">' +
+              '<div class="cardImageContainer coveredImage" style="background-image:url(\'' + imgEsc + '\');">' +
+                '<div><img src="' + imgEsc + '" alt="' + nameEsc + '" loading="lazy" class="prism-card-img" /></div>' +
+              '</div>' +
+            '</div>' +
+            (opts.extraScalableHtml || '') +
+            '<div class="cardOverlayContainer prism-card-overlay itemAction">' +
+              '<a class="cardImageContainer prism-card-overlay-link" href="#/details?id=' + idAttr + '" aria-label="' + nameEsc + '"></a>' +
+              '<button type="button" class="cardOverlayFab-primary" aria-label="Play" style="cursor:pointer;"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true" style="display:block;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg></button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cardFooter">' +
+            '<div class="cardText cardText-first">' + nameEsc + '</div>' +
+            '<div class="cardText cardText-secondary">' + (opts.secondaryHtml || '') + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+

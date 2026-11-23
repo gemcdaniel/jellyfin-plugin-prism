@@ -266,6 +266,44 @@ if (window.__prismInit) {
     }
   }
 
+  function focusWithoutScroll(el) {
+    if (!el || typeof el.focus !== 'function') return;
+    try {
+      el.focus({ preventScroll: true });
+    } catch (_) {
+      el.focus();
+    }
+  }
+
+  function buildMediaCardHtml(opts) {
+    var idAttr = escapeHtml(opts.id);
+    var nameEsc = escapeHtml(opts.name);
+    var imgEsc = escapeHtml(opts.imgUrl);
+    return (
+      '<div class="' + opts.cardClass + '" tabindex="0" ' + opts.cardAttrs + '>' +
+        '<div class="cardBox cardBox-bottompadded">' +
+          '<div class="cardScalable">' +
+            '<div class="' + opts.padderClass + '"></div>' +
+            '<div class="cardContent">' +
+              '<div class="cardImageContainer coveredImage" style="background-image:url(\'' + imgEsc + '\');">' +
+                '<div><img src="' + imgEsc + '" alt="' + nameEsc + '" loading="lazy" class="prism-card-img" /></div>' +
+              '</div>' +
+            '</div>' +
+            (opts.extraScalableHtml || '') +
+            '<div class="cardOverlayContainer prism-card-overlay itemAction">' +
+              '<a class="cardImageContainer prism-card-overlay-link" href="#/details?id=' + idAttr + '" aria-label="' + nameEsc + '"></a>' +
+              '<button type="button" class="cardOverlayFab-primary" aria-label="Play" style="cursor:pointer;"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true" style="display:block;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg></button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cardFooter">' +
+            '<div class="cardText cardText-first">' + nameEsc + '</div>' +
+            '<div class="cardText cardText-secondary">' + (opts.secondaryHtml || '') + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
   // --- 02-stability.js ---
 // ------------------------------------------------------------------------
   // Stability Fixes: Backdrop DOM Leak Prune, Dashboard Back Fix, TV Guide Scroll
@@ -418,11 +456,7 @@ if (window.__prismInit) {
         if (document.activeElement === prevActive) {
           var nextCell = findAdjacentGuideCell(cell, direction);
           if (nextCell) {
-            try {
-              nextCell.focus({ preventScroll: true });
-            } catch (_) {
-              nextCell.focus();
-            }
+            focusWithoutScroll(nextCell);
             ensureGuideCellVisible(nextCell);
           }
         } else if (document.activeElement) {
@@ -468,11 +502,7 @@ if (window.__prismInit) {
     }
     var target = findFirstVisibleHomeTarget();
     if (target) {
-      try {
-        target.focus({ preventScroll: true });
-      } catch (_) {
-        target.focus();
-      }
+      focusWithoutScroll(target);
     }
   }
 
@@ -488,11 +518,7 @@ if (window.__prismInit) {
       var target = findFirstVisibleHomeTarget();
       if (target) {
         e.preventDefault();
-        try {
-          target.focus({ preventScroll: true });
-        } catch (_) {
-          target.focus();
-        }
+        focusWithoutScroll(target);
       }
     }, true);
   }
@@ -1364,6 +1390,65 @@ if (window.__prismInit) {
     }, true);
   }
 
+  function renderSpotlightActionButtons(btnWrap, item) {
+    var wlHtml = '';
+    if (state.config.enableWatchlist) {
+      var isWl = isItemWatchlisted(item.Id);
+      wlHtml =
+        '<button type="button" class="detail-button prism-watchlist-btn' + (isWl ? ' is-active' : '') + '" data-prism-wl-id="' + escapeHtml(normalizeItemId(item.Id)) + '" aria-pressed="' + (isWl ? 'true' : 'false') + '">' +
+          renderWatchlistSvg(isWl) +
+          '<span>' + (isWl ? 'In Watchlist' : 'Watchlist') + '</span>' +
+        '</button>';
+    }
+
+    btnWrap.innerHTML =
+      '<button type="button" class="play-button"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
+      '<button type="button" class="detail-button">Details</button>' +
+      wlHtml;
+
+    var playBtn = btnWrap.querySelector('.play-button');
+    var detailBtn = btnWrap.querySelector('.detail-button:not(.prism-watchlist-btn)');
+    var wlBtn = btnWrap.querySelector('.prism-watchlist-btn');
+    if (playBtn) playBtn.addEventListener('click', function () { navigateToItem(item.Id); });
+    if (detailBtn) detailBtn.addEventListener('click', function () { navigateToItem(item.Id); });
+    if (wlBtn) {
+      wlBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleWatchlistItem(item.Id);
+      });
+    }
+  }
+
+  function renderSpotlightDots(dotsEl, count, activeIndex) {
+    var dotsHtml = '';
+    for (var i = 0; i < count; i += 1) {
+      dotsHtml += '<button type="button" tabindex="-1" class="dot ' + (i === activeIndex ? 'active' : '') + '" data-slide-idx="' + i + '" aria-label="Slide ' + (i + 1) + '"></button>';
+    }
+    dotsEl.innerHTML = dotsHtml;
+  }
+
+  function bindSpotlightNavigation(targetEl, prevBtn, nextBtn, dotsEl, opts) {
+    prevBtn.addEventListener('click', opts.onPrev);
+    nextBtn.addEventListener('click', opts.onNext);
+    dotsEl.addEventListener('click', function (e) {
+      var dot = e.target && e.target.closest ? e.target.closest('[data-slide-idx]') : null;
+      if (dot) opts.onSelect(Number(dot.getAttribute('data-slide-idx')));
+    });
+
+    targetEl.addEventListener('mouseenter', function () { opts.onPauseHover(true); });
+    targetEl.addEventListener('mouseleave', function () { opts.onPauseHover(false); });
+    targetEl.addEventListener('focusin', function () { opts.onPauseHover(true); });
+    targetEl.addEventListener('focusout', function () { opts.onPauseHover(false); });
+
+    attachSwipeHandlers(targetEl, {
+      getCount: opts.getCount,
+      onNext: opts.onNext,
+      onPrev: opts.onPrev,
+      onPauseChange: opts.onPauseTouch
+    });
+  }
+
   function renderHeroSpotlight(hostPage, heroItems) {
     if (!state.config.enableHeroSpotlight || !heroItems || heroItems.length === 0) {
       return;
@@ -1475,40 +1560,8 @@ if (window.__prismInit) {
         renderLogoOrTitle(logoEl, item, 'h2');
         infoEl.innerHTML = buildPillsHtml(item);
         plotEl.textContent = item.Overview || '';
-
-        var wlHtml = '';
-        if (state.config.enableWatchlist) {
-          var isWl = isItemWatchlisted(item.Id);
-          wlHtml =
-            '<button type="button" class="detail-button prism-watchlist-btn' + (isWl ? ' is-active' : '') + '" data-prism-wl-id="' + escapeHtml(normalizeItemId(item.Id)) + '" aria-pressed="' + (isWl ? 'true' : 'false') + '">' +
-              renderWatchlistSvg(isWl) +
-              '<span>' + (isWl ? 'In Watchlist' : 'Watchlist') + '</span>' +
-            '</button>';
-        }
-
-        btnWrap.innerHTML =
-          '<button type="button" class="play-button" style="display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
-          '<button type="button" class="detail-button">Details</button>' +
-          wlHtml;
-
-        var playBtn = btnWrap.querySelector('.play-button');
-        var detailBtn = btnWrap.querySelector('.detail-button:not(.prism-watchlist-btn)');
-        var wlBtn = btnWrap.querySelector('.prism-watchlist-btn');
-        if (playBtn) playBtn.addEventListener('click', function () { navigateToItem(item.Id); });
-        if (detailBtn) detailBtn.addEventListener('click', function () { navigateToItem(item.Id); });
-        if (wlBtn) {
-          wlBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleWatchlistItem(item.Id);
-          });
-        }
-
-        var dotsHtml = '';
-        for (var i = 0; i < heroItems.length; i += 1) {
-          dotsHtml += '<button type="button" tabindex="-1" class="dot ' + (i === state.slideIndex ? 'active' : '') + '" data-slide-idx="' + i + '" aria-label="Slide ' + (i + 1) + '"></button>';
-        }
-        dotsEl.innerHTML = dotsHtml;
+        renderSpotlightActionButtons(btnWrap, item);
+        renderSpotlightDots(dotsEl, heroItems.length, state.slideIndex);
 
         applyAmbientColorForUrl('hero-' + item.Id, buildImageUrl(item.Id, 'Backdrop', 64, item.BackdropImageTag, 0));
       }
@@ -1516,11 +1569,16 @@ if (window.__prismInit) {
       scheduleNextHeroTick();
     }
 
-    prevBtn.addEventListener('click', function () { drawSlide(state.slideIndex - 1, 0); });
-    nextBtn.addEventListener('click', function () { drawSlide(state.slideIndex + 1, 0); });
-    dotsEl.addEventListener('click', function (e) {
-      var dot = e.target && e.target.closest ? e.target.closest('[data-slide-idx]') : null;
-      if (dot) drawSlide(Number(dot.getAttribute('data-slide-idx')), 0);
+    bindSpotlightNavigation(wrapper, prevBtn, nextBtn, dotsEl, {
+      getCount: function () { return heroItems.length; },
+      onPrev: function () { drawSlide(state.slideIndex - 1, 0); },
+      onNext: function () { drawSlide(state.slideIndex + 1, 0); },
+      onSelect: function (idx) { drawSlide(idx, 0); },
+      onPauseHover: function (p) { paused = p; },
+      onPauseTouch: function (p) {
+        touchPaused = p;
+        if (!p) paused = false;
+      }
     });
 
     wrapper.addEventListener('keydown', function (e) {
@@ -1576,21 +1634,6 @@ if (window.__prismInit) {
         e.preventDefault();
         e.stopPropagation();
         focusables[idx - 1].focus();
-      }
-    });
-
-    wrapper.addEventListener('mouseenter', function () { paused = true; });
-    wrapper.addEventListener('mouseleave', function () { paused = false; });
-    wrapper.addEventListener('focusin', function () { paused = true; });
-    wrapper.addEventListener('focusout', function () { paused = false; });
-
-    attachSwipeHandlers(wrapper, {
-      getCount: function () { return heroItems.length; },
-      onNext: function () { drawSlide(state.slideIndex + 1, 0); },
-      onPrev: function () { drawSlide(state.slideIndex - 1, 0); },
-      onPauseChange: function (p) {
-        touchPaused = p;
-        if (!p) paused = false;
       }
     });
 
@@ -1689,61 +1732,19 @@ if (window.__prismInit) {
       renderLogoOrTitle(logoEl, item, 'h3');
       infoEl.innerHTML = buildPillsHtml(item);
       plotEl.textContent = item.Overview || '';
-
-      var wlHtml = '';
-      if (state.config.enableWatchlist) {
-        var isWl = isItemWatchlisted(item.Id);
-        wlHtml =
-          '<button type="button" class="detail-button prism-watchlist-btn' + (isWl ? ' is-active' : '') + '" data-prism-wl-id="' + escapeHtml(normalizeItemId(item.Id)) + '" aria-pressed="' + (isWl ? 'true' : 'false') + '">' +
-            renderWatchlistSvg(isWl) +
-            '<span>' + (isWl ? 'In Watchlist' : 'Watchlist') + '</span>' +
-          '</button>';
-      }
-
-      btnWrap.innerHTML =
-        '<button type="button" class="play-button" style="display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>View &amp; Play</span></button>' +
-        '<button type="button" class="detail-button">Details</button>' +
-        wlHtml;
-
-      var playBtn = btnWrap.querySelector('.play-button');
-      var detailBtn = btnWrap.querySelector('.detail-button:not(.prism-watchlist-btn)');
-      var wlBtn = btnWrap.querySelector('.prism-watchlist-btn');
-      if (playBtn) playBtn.addEventListener('click', function () { navigateToItem(item.Id); });
-      if (detailBtn) detailBtn.addEventListener('click', function () { navigateToItem(item.Id); });
-      if (wlBtn) {
-        wlBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleWatchlistItem(item.Id);
-        });
-      }
-
-      var dotsHtml = '';
-      for (var i = 0; i < items.length; i += 1) {
-        dotsHtml += '<button type="button" tabindex="-1" class="dot ' + (i === slideIdx ? 'active' : '') + '" data-slide-idx="' + i + '" aria-label="Slide ' + (i + 1) + '"></button>';
-      }
-      dotsEl.innerHTML = dotsHtml;
+      renderSpotlightActionButtons(btnWrap, item);
+      renderSpotlightDots(dotsEl, items.length, slideIdx);
 
       scheduleInlineTick();
     }
 
-    prevBtn.addEventListener('click', function () { drawInline(slideIdx - 1); });
-    nextBtn.addEventListener('click', function () { drawInline(slideIdx + 1); });
-    dotsEl.addEventListener('click', function (e) {
-      var dot = e.target && e.target.closest ? e.target.closest('[data-slide-idx]') : null;
-      if (dot) drawInline(Number(dot.getAttribute('data-slide-idx')));
-    });
-
-    stage.addEventListener('mouseenter', function () { paused = true; });
-    stage.addEventListener('mouseleave', function () { paused = false; });
-    stage.addEventListener('focusin', function () { paused = true; });
-    stage.addEventListener('focusout', function () { paused = false; });
-
-    attachSwipeHandlers(stage, {
+    bindSpotlightNavigation(stage, prevBtn, nextBtn, dotsEl, {
       getCount: function () { return items.length; },
-      onNext: function () { drawInline(slideIdx + 1); },
       onPrev: function () { drawInline(slideIdx - 1); },
-      onPauseChange: function (p) {
+      onNext: function () { drawInline(slideIdx + 1); },
+      onSelect: function (idx) { drawInline(idx); },
+      onPauseHover: function (p) { paused = p; },
+      onPauseTouch: function (p) {
         touchPaused = p;
         if (!p) paused = false;
       }
@@ -1916,37 +1917,57 @@ if (window.__prismInit) {
         '</button>';
     }
 
-    var cardClass = isThumb
-      ? 'card overflowBackdropCard prism-card-thumb card-hoverable card-withuserdata'
-      : 'card overflowPortraitCard card-hoverable card-withuserdata';
-    var padderClass = isThumb
-      ? 'cardPadder cardPadder-overflowBackdrop'
-      : 'cardPadder cardPadder-overflowPortrait';
+    return buildMediaCardHtml({
+      id: item.Id,
+      name: item.Name,
+      imgUrl: imgUrl,
+      cardClass: isThumb
+        ? 'card overflowBackdropCard prism-card-thumb card-hoverable card-withuserdata'
+        : 'card overflowPortraitCard card-hoverable card-withuserdata',
+      cardAttrs: 'data-prism-item-id="' + escapeHtml(item.Id) + '" style="flex:0 0 auto;"',
+      padderClass: isThumb
+        ? 'cardPadder cardPadder-overflowBackdrop'
+        : 'cardPadder cardPadder-overflowPortrait',
+      extraScalableHtml: renderBadgePillsHtml(item.Badges) + wlBtnHtml,
+      secondaryHtml: secondaryText
+    });
+  }
 
+  function buildScrollerSectionHtml(section, itemsHtml) {
     return (
-      '<div class="' + cardClass + '" tabindex="0" data-prism-item-id="' + escapeHtml(item.Id) + '" style="flex:0 0 auto;">' +
-        '<div class="cardBox cardBox-bottompadded">' +
-          '<div class="cardScalable">' +
-            '<div class="' + padderClass + '"></div>' +
-            '<div class="cardContent">' +
-              '<div class="cardImageContainer coveredImage" style="background-image:url(\'' + escapeHtml(imgUrl) + '\');">' +
-                '<div><img src="' + escapeHtml(imgUrl) + '" alt="' + escapeHtml(item.Name) + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>' +
-              '</div>' +
-            '</div>' +
-            renderBadgePillsHtml(item.Badges) +
-            wlBtnHtml +
-            '<div class="cardOverlayContainer itemAction" style="position:absolute;inset:0;opacity:0;">' +
-              '<a class="cardImageContainer" href="#/details?id=' + escapeHtml(item.Id) + '" aria-label="' + escapeHtml(item.Name) + '" style="position:absolute;inset:0;"></a>' +
-              '<button type="button" class="cardOverlayFab-primary" aria-label="Play" style="z-index:2;width:52px;height:52px;padding:0;line-height:1;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true" style="display:block;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg></button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="cardFooter">' +
-            '<div class="cardText cardText-first">' + escapeHtml(item.Name) + '</div>' +
-            '<div class="cardText cardText-secondary">' + secondaryText + '</div>' +
-          '</div>' +
+      '<div class="sectionTitleContainer sectionTitleContainer-cards prism-section-header">' +
+        '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:0.35rem;">' +
+          '<h2 class="sectionTitle sectionTitle-cards">' + escapeHtml(section.Title) + '</h2>' +
+          (section.Badge ? '<span class="prism-section-pill">' + escapeHtml(section.Badge) + '</span>' : '') +
+        '</div>' +
+        '<div class="prism-scroll-nav">' +
+          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="-1" aria-label="Scroll left">&#8249;</button>' +
+          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="1" aria-label="Scroll right">&#8250;</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="prism-scroller" data-horizontal="true" style="overflow-x:auto;overflow-y:visible;">' +
+        '<div class="scrollSlider prism-items-container focuscontainer-x" style="display:flex;flex-wrap:nowrap;">' +
+          itemsHtml +
         '</div>' +
       '</div>'
     );
+  }
+
+  function handleSectionScrollClick(sectionEl, e) {
+    var scrollBtn = e.target && e.target.closest ? e.target.closest('[data-prism-scroll]') : null;
+    if (!scrollBtn) return false;
+    e.preventDefault();
+    var scroller = sectionEl.querySelector('.prism-scroller');
+    if (scroller) {
+      var dir = Number(scrollBtn.getAttribute('data-prism-scroll')) || 1;
+      var delta = dir * Math.max(320, scroller.clientWidth * 0.8);
+      if (typeof scroller.scrollBy === 'function') {
+        scroller.scrollBy({ left: delta, behavior: 'smooth' });
+      } else {
+        scroller.scrollLeft += delta;
+      }
+    }
+    return true;
   }
 
   function renderThematicGridSection(section) {
@@ -1975,36 +1996,10 @@ if (window.__prismInit) {
         '</div>';
     }
 
-    el.innerHTML =
-      '<div class="sectionTitleContainer sectionTitleContainer-cards prism-section-header">' +
-        '<div style="display:flex;align-items:center;">' +
-          '<h2 class="sectionTitle sectionTitle-cards">' + escapeHtml(section.Title) + '</h2>' +
-          (section.Badge ? '<span class="prism-section-pill">' + escapeHtml(section.Badge) + '</span>' : '') +
-        '</div>' +
-        '<div class="prism-scroll-nav">' +
-          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="-1" aria-label="Scroll left">&#8249;</button>' +
-          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="1" aria-label="Scroll right">&#8250;</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="prism-scroller" data-horizontal="true" style="overflow-x:auto;overflow-y:visible;">' +
-        '<div class="scrollSlider prism-items-container focuscontainer-x" style="display:flex;flex-wrap:nowrap;">' +
-          tilesHtml +
-        '</div>' +
-      '</div>';
+    el.innerHTML = buildScrollerSectionHtml(section, tilesHtml);
 
     el.addEventListener('click', function (e) {
-      var scrollBtn = e.target && e.target.closest ? e.target.closest('[data-prism-scroll]') : null;
-      if (scrollBtn) {
-        e.preventDefault();
-        var scroller = el.querySelector('.prism-scroller');
-        if (scroller) {
-          var dir = Number(scrollBtn.getAttribute('data-prism-scroll')) || 1;
-          var delta = dir * Math.max(320, scroller.clientWidth * 0.8);
-          if (typeof scroller.scrollBy === 'function') scroller.scrollBy({ left: delta, behavior: 'smooth' });
-          else scroller.scrollLeft += delta;
-        }
-        return;
-      }
+      if (handleSectionScrollClick(el, e)) return;
       var tileEl = e.target && e.target.closest ? e.target.closest('[data-prism-theme-id]') : null;
       if (tileEl) {
         e.preventDefault();
@@ -2043,22 +2038,7 @@ if (window.__prismInit) {
       cardsHtml += renderPosterOrThumbCardHtml(section.Items[i], section.CardFormat);
     }
 
-    el.innerHTML =
-      '<div class="sectionTitleContainer sectionTitleContainer-cards prism-section-header">' +
-        '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:0.2rem;">' +
-          '<h2 class="sectionTitle sectionTitle-cards">' + escapeHtml(section.Title) + '</h2>' +
-          (section.Badge ? '<span class="prism-section-pill">' + escapeHtml(section.Badge) + '</span>' : '') +
-        '</div>' +
-        '<div class="prism-scroll-nav">' +
-          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="-1" aria-label="Scroll left">&#8249;</button>' +
-          '<button type="button" tabindex="-1" class="prism-scroll-btn" data-prism-scroll="1" aria-label="Scroll right">&#8250;</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="prism-scroller" data-horizontal="true" style="overflow-x:auto;overflow-y:visible;">' +
-        '<div class="scrollSlider prism-items-container focuscontainer-x" style="display:flex;flex-wrap:nowrap;">' +
-          cardsHtml +
-        '</div>' +
-      '</div>';
+    el.innerHTML = buildScrollerSectionHtml(section, cardsHtml);
 
     el.addEventListener('click', function (e) {
       var wlBtn = e.target && e.target.closest ? e.target.closest('.prism-card-wl-btn') : null;
@@ -2069,21 +2049,7 @@ if (window.__prismInit) {
         return;
       }
 
-      var scrollBtn = e.target && e.target.closest ? e.target.closest('[data-prism-scroll]') : null;
-      if (scrollBtn) {
-        e.preventDefault();
-        var scroller = el.querySelector('.prism-scroller');
-        if (scroller) {
-          var dir = Number(scrollBtn.getAttribute('data-prism-scroll')) || 1;
-          var delta = dir * Math.max(320, scroller.clientWidth * 0.8);
-          if (typeof scroller.scrollBy === 'function') {
-            scroller.scrollBy({ left: delta, behavior: 'smooth' });
-          } else {
-            scroller.scrollLeft += delta;
-          }
-        }
-        return;
-      }
+      if (handleSectionScrollClick(el, e)) return;
 
       var card = e.target && e.target.closest ? e.target.closest('[data-prism-item-id]') : null;
       if (card) {
@@ -2110,12 +2076,8 @@ if (window.__prismInit) {
     if (existing && existing.parentNode) {
       existing.parentNode.removeChild(existing);
     }
-    if (restoreFocusEl && typeof restoreFocusEl.focus === 'function' && document.body.contains(restoreFocusEl)) {
-      try {
-        restoreFocusEl.focus({ preventScroll: true });
-      } catch (_) {
-        restoreFocusEl.focus();
-      }
+    if (restoreFocusEl && document.body.contains(restoreFocusEl)) {
+      focusWithoutScroll(restoreFocusEl);
     }
   }
 
@@ -2366,11 +2328,7 @@ if (window.__prismInit) {
       if (fromUserTrigger && isTvLayout() && firstNewSection) {
         var focusTarget = firstNewSection.querySelector('.card, .play-button, .prism-theme-tile');
         if (focusTarget) {
-          try {
-            focusTarget.focus({ preventScroll: true });
-          } catch (_) {
-            focusTarget.focus();
-          }
+          focusWithoutScroll(focusTarget);
         }
       }
     }).catch(function () {
@@ -2631,28 +2589,15 @@ if (window.__prismInit) {
 
     var yearText = item.ProductionYear ? String(item.ProductionYear) : '';
 
-    return (
-      '<div class="card ' + cardShape + ' card-hoverable card-withuserdata" tabindex="0" data-prism-lib-card="1" data-id="' + escapeHtml(item.Id) + '" data-type="' + escapeHtml(item.Type || itemType) + '">' +
-        '<div class="cardBox cardBox-bottompadded">' +
-          '<div class="cardScalable">' +
-            '<div class="' + padderClass + '"></div>' +
-            '<div class="cardContent">' +
-              '<div class="cardImageContainer coveredImage" style="background-image:url(\'' + escapeHtml(imgUrl) + '\');">' +
-                '<div><img src="' + escapeHtml(imgUrl) + '" alt="' + escapeHtml(item.Name) + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" /></div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="cardOverlayContainer itemAction" style="position:absolute;inset:0;opacity:0;">' +
-              '<a class="cardImageContainer" href="#/details?id=' + escapeHtml(item.Id) + '" aria-label="' + escapeHtml(item.Name) + '" style="position:absolute;inset:0;"></a>' +
-              '<button type="button" class="cardOverlayFab-primary" aria-label="Play" style="z-index:2;width:52px;height:52px;padding:0;line-height:1;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true" style="display:block;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg></button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="cardFooter">' +
-            '<div class="cardText cardText-first">' + escapeHtml(item.Name) + '</div>' +
-            '<div class="cardText cardText-secondary">' + escapeHtml(yearText) + '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>'
-    );
+    return buildMediaCardHtml({
+      id: item.Id,
+      name: item.Name,
+      imgUrl: imgUrl,
+      cardClass: 'card ' + cardShape + ' card-hoverable card-withuserdata',
+      cardAttrs: 'data-prism-lib-card="1" data-id="' + escapeHtml(item.Id) + '" data-type="' + escapeHtml(item.Type || itemType) + '"',
+      padderClass: padderClass,
+      secondaryHtml: escapeHtml(yearText)
+    });
   }
 
   function loadNextLibraryBatch(fromUserTrigger) {
@@ -2731,11 +2676,7 @@ if (window.__prismInit) {
         scheduleNativeBadgeScan();
 
         if (fromUserTrigger && isTvLayout() && firstAdded) {
-          try {
-            firstAdded.focus({ preventScroll: true });
-          } catch (_) {
-            firstAdded.focus();
-          }
+          focusWithoutScroll(firstAdded);
         }
       }
 
@@ -2958,18 +2899,6 @@ if (window.__prismInit) {
     state.badgeScanTimer = window.setTimeout(scanNativeCardsForBadges, 180);
   }
 
-  function installCardHoverRule() {
-    if (document.getElementById('prism-js-helpers')) return;
-    var style = document.createElement('style');
-    style.id = 'prism-js-helpers';
-    style.textContent =
-      '.prism-home-section .card:hover .cardOverlayContainer,' +
-      '.prism-home-section .card:focus-within .cardOverlayContainer,' +
-      '.card[data-prism-lib-card="1"]:hover .cardOverlayContainer,' +
-      '.card[data-prism-lib-card="1"]:focus-within .cardOverlayContainer{opacity:1 !important;}';
-    document.head.appendChild(style);
-  }
-
   function removeInjectedHomeDom(activeHome) {
     if (!activeHome) return;
     if (activeHome.page) {
@@ -3092,7 +3021,6 @@ if (window.__prismInit) {
   }
 
   function bootstrap() {
-    installCardHoverRule();
     ensureBackdropLeakFix();
     initDashboardBackButtonFix();
     initTvGuideScrollFix();

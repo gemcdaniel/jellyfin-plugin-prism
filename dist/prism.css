@@ -208,7 +208,6 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   border-right: 1px solid var(--prism-border) !important;
 }
 
-.MuiDrawer-docked .MuiListItemButton-root,
 .MuiDrawer-paper .MuiListItemButton-root {
   border-radius: 10px !important;
   margin: 2px 10px !important;
@@ -217,13 +216,11 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   transition: background-color 160ms var(--prism-ease), color 160ms var(--prism-ease);
 }
 
-.MuiDrawer-docked .MuiListItemButton-root:hover,
 .MuiDrawer-paper .MuiListItemButton-root:hover {
   background-color: rgba(255, 255, 255, 0.06) !important;
   color: var(--prism-text) !important;
 }
 
-.MuiDrawer-docked .MuiListItemButton-root.Mui-selected,
 .MuiDrawer-paper .MuiListItemButton-root.Mui-selected {
   background: linear-gradient(135deg, rgba(124, 92, 255, 0.24), rgba(0, 212, 255, 0.16)) !important;
   border: 1px solid rgba(0, 212, 255, 0.35) !important;
@@ -444,8 +441,12 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   background-image: none !important;
   color: var(--prism-text) !important;
   border: 1px solid var(--prism-border-strong) !important;
-  border-radius: var(--prism-radius-lg) !important;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
+}
+
+.dialog,
+.MuiDialog-paper {
+  border-radius: var(--prism-radius-lg) !important;
 }
 
 .MuiDrawer-paper {
@@ -885,34 +886,104 @@ html.prism-hero-page.prism-at-top .MuiAppBar-root .MuiToolbar-root {
   transition: opacity 180ms var(--prism-ease);
 }
 
-.cardOverlayFab-primary {
-  background: var(--prism-gradient) !important;
-  color: #FFFFFF !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
-  box-shadow: 0 8px 24px rgba(124, 92, 255, 0.55), 0 0 18px rgba(0, 212, 255, 0.3);
-  transition: transform 180ms var(--prism-ease), box-shadow 180ms var(--prism-ease);
-}
-
-.cardOverlayFab-primary:hover {
-  transform: scale(1.08);
-  box-shadow: 0 10px 28px rgba(124, 92, 255, 0.65), 0 0 22px rgba(0, 212, 255, 0.45);
-}
-
-/* Center overlay play button cleanly across native and injected cards */
-.cardOverlayContainer .cardOverlayFab-primary,
-.card .cardOverlayFab-primary {
+/* Center overlay play button cleanly across native, injected, and mobile cards */
+.card .cardOverlayFab-primary,
+.card .cardOverlayButton-br[data-action="play"],
+.card .cardOverlayButton-br[data-action="resume"],
+.card .cardOverlayButton-centered {
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
   right: auto !important;
   bottom: auto !important;
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  min-height: 46px !important;
   margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--prism-radius-pill) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--prism-gradient) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 8px 24px rgba(124, 92, 255, 0.55), 0 0 18px rgba(0, 212, 255, 0.3) !important;
   transform: translate(-50%, -50%) !important;
+  transition: transform 180ms var(--prism-ease), box-shadow 180ms var(--prism-ease);
+  z-index: 2;
 }
 
-.cardOverlayContainer .cardOverlayFab-primary:hover,
-.card .cardOverlayFab-primary:hover {
+.card .cardOverlayButton-br[data-action="play"] .cardOverlayButtonIcon,
+.card .cardOverlayButton-br[data-action="resume"] .cardOverlayButtonIcon,
+.card .cardOverlayButton-centered .cardOverlayButtonIcon {
+  background: transparent !important;
+  background-color: transparent !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: 1.55rem !important;
+  color: #FFFFFF !important;
+}
+
+.card .cardOverlayButton-br[data-action="menu"] {
+  bottom: 0.35rem !important;
+  right: 0.35rem !important;
+  padding: 0 !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+}
+
+html[dir="rtl"] .card .cardOverlayButton-br[data-action="menu"] {
+  right: auto !important;
+  left: 0.35rem !important;
+}
+
+.card .cardOverlayButton-br[data-action="menu"] .cardOverlayButtonIcon {
+  background-color: rgba(8, 10, 16, 0.82) !important;
+  border: 1px solid var(--prism-border) !important;
+  color: var(--prism-text) !important;
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 1.15rem !important;
+}
+
+.card .cardOverlayFab-primary:hover,
+.card .cardOverlayButton-br[data-action="play"]:hover,
+.card .cardOverlayButton-br[data-action="resume"]:hover,
+.card .cardOverlayButton-centered:hover {
   transform: translate(-50%, -50%) scale(1.08) !important;
+  box-shadow: 0 10px 28px rgba(124, 92, 255, 0.65), 0 0 22px rgba(0, 212, 255, 0.45) !important;
+}
+
+/* Hover overlay for Prism-injected cards without inline opacity or runtime style injection */
+.prism-card-img,
+.cardOverlayContainer.prism-card-overlay,
+.prism-card-overlay-link {
+  position: absolute;
+  inset: 0;
+}
+
+.prism-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardOverlayContainer.prism-card-overlay {
+  opacity: 0;
+}
+
+@media (hover: hover) {
+  .card:hover .cardOverlayContainer.prism-card-overlay {
+    opacity: 1;
+  }
+}
+
+.card:focus-within .cardOverlayContainer.prism-card-overlay {
+  opacity: 1;
 }
 
 html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
@@ -926,6 +997,13 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
 }
 
 /* Redesigned Multi-Select Ring & Circular Corner Checkbox (Movies, TV Shows, Grids) */
+.selectionCommandsPanel {
+  background-color: rgba(8, 10, 18, 0.94) !important;
+  border-bottom: 1px solid var(--prism-border);
+  color: var(--prism-text) !important;
+}
+
+.cardBox .itemSelectionPanel,
 .itemSelectionPanel {
   border: none !important;
   outline: none !important;
@@ -935,45 +1013,44 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
   transition: background-color 150ms var(--prism-ease);
 }
 
-.itemSelectionPanel .chkCardSelectContainer,
-.cardScalable .chkCardSelectContainer {
-  position: absolute !important;
-  top: 0.45rem !important;
-  left: 0.45rem !important;
-  right: auto !important;
-  bottom: auto !important;
-  z-index: 6 !important;
-  width: 28px !important;
-  height: 28px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer;
-}
-
-.chkCardSelectContainer .checkboxLabel {
-  display: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.chkCardSelectContainer .chkCardSelect {
+.itemSelectionPanel .checkboxContainer {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
-  opacity: 0 !important;
+  padding: 0 !important;
+  display: block !important;
   cursor: pointer;
-  z-index: 2;
 }
 
-.chkCardSelectContainer .checkboxOutline {
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
+.itemSelectionPanel .checkboxContainer .checkboxLabel {
+  display: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.itemSelectionPanel .chkItemSelect {
+  position: absolute !important;
+  top: 0.45rem !important;
+  left: 0.45rem !important;
+  width: 26px !important;
+  height: 26px !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.cardBox .itemSelectionPanel .multiSelectCheckboxOutline,
+.cardBox .itemSelectionPanel .checkboxOutline,
+.itemSelectionPanel .multiSelectCheckboxOutline,
+.itemSelectionPanel .checkboxOutline {
+  position: absolute !important;
+  top: 0.45rem !important;
+  left: 0.45rem !important;
+  right: auto !important;
+  bottom: auto !important;
   transform: none !important;
   width: 24px !important;
   height: 24px !important;
@@ -982,7 +1059,7 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
   margin: 0 !important;
   border-radius: var(--prism-radius-pill) !important;
   border: 1.5px solid rgba(255, 255, 255, 0.72) !important;
-  background-color: rgba(8, 10, 16, 0.8) !important;
+  background-color: rgba(8, 10, 16, 0.82) !important;
   color: #FFFFFF !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.65) !important;
   display: inline-flex !important;
@@ -991,32 +1068,19 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
   transition: background 150ms var(--prism-ease), border-color 150ms var(--prism-ease), box-shadow 150ms var(--prism-ease);
 }
 
-.chkCardSelectContainer .chkCardSelect:checked ~ .checkboxOutline,
-.chkCardSelectContainer .chkCardSelect:checked + .checkboxOutline {
+.cardBox .itemSelectionPanel .chkItemSelect:checked ~ .multiSelectCheckboxOutline,
+.cardBox .itemSelectionPanel .chkItemSelect:checked ~ .checkboxOutline,
+.cardBox .itemSelectionPanel .emby-checkbox:checked + span + .checkboxOutline {
   background: var(--prism-gradient) !important;
   border-color: rgba(255, 255, 255, 0.92) !important;
   color: #FFFFFF !important;
   box-shadow: 0 4px 14px rgba(0, 212, 255, 0.48) !important;
 }
 
-.chkCardSelectContainer .checkboxIcon-checked {
-  font-size: 16px !important;
+.itemSelectionPanel .checkboxIcon,
+.itemSelectionPanel .checkboxIcon-checked {
+  font-size: 15px !important;
   line-height: 1 !important;
-}
-
-.itemSelectionPanel .MuiCheckbox-root {
-  position: absolute !important;
-  top: 0.35rem !important;
-  left: 0.35rem !important;
-  padding: 4px !important;
-  border-radius: var(--prism-radius-pill) !important;
-  background-color: rgba(8, 10, 16, 0.78) !important;
-  color: rgba(255, 255, 255, 0.85) !important;
-}
-
-.itemSelectionPanel .MuiCheckbox-root.Mui-checked {
-  background: var(--prism-gradient) !important;
-  color: #FFFFFF !important;
 }
 
 .card.selected,
@@ -1026,22 +1090,23 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
   outline: none !important;
 }
 
-.card.selected .cardBox,
-.card[data-selected="true"] .cardBox {
+.card.selected .cardBox {
   border-color: var(--prism-accent-2) !important;
   box-shadow: 0 0 0 2.5px var(--prism-accent-2), 0 10px 24px rgba(var(--prism-dynamic-rgb), 0.35) !important;
 }
 
 @supports selector(:has(*)) {
-  .card:has(.itemSelectionPanel) .prism-card-badges {
-    opacity: 0;
+  .card:has(.itemSelectionPanel) .prism-card-badges,
+  .card:has(.itemSelectionPanel) .prism-card-wl-btn {
+    opacity: 0 !important;
+    pointer-events: none;
   }
 
-  .card:has(.chkCardSelect:checked) .itemSelectionPanel {
+  .card:has(.chkItemSelect:checked) .itemSelectionPanel {
     background-color: rgba(var(--prism-dynamic-rgb), 0.16) !important;
   }
 
-  .card:has(.chkCardSelect:checked) .cardBox {
+  .card:has(.chkItemSelect:checked) .cardBox {
     border-color: var(--prism-accent-2) !important;
     box-shadow: 0 0 0 2.5px var(--prism-accent-2), 0 10px 24px rgba(var(--prism-dynamic-rgb), 0.35) !important;
   }
@@ -2129,6 +2194,7 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.4rem;
   background: var(--prism-gradient) !important;
   color: #FFFFFF !important;
   border: none !important;
@@ -2374,77 +2440,10 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
     linear-gradient(180deg, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.04) 26%, rgba(0, 0, 0, 0.14) 44%, rgba(0, 0, 0, 0.72) 72%, var(--prism-bg) 100%);
 }
 
-.layout-mobile #slides-container .prism-hero-content {
-  width: 100%;
-}
-
 .layout-mobile #slides-container .prism-hero-reason {
   margin-bottom: 0.45rem;
   padding: 0.18rem 0.55rem;
   font-size: 0.68rem;
-}
-
-.layout-mobile #slides-container .logo-container {
-  max-width: min(260px, 76vw);
-  margin-bottom: 0.5rem;
-}
-
-.layout-mobile #slides-container .prism-hero-logo {
-  max-width: min(260px, 76vw);
-  max-height: 64px;
-}
-
-.layout-mobile #slides-container .prism-hero-title {
-  font-size: clamp(1.35rem, 6vw, 1.85rem);
-}
-
-.layout-mobile #slides-container .info-container {
-  gap: 0.35rem;
-  font-size: 0.8rem;
-}
-
-.layout-mobile #slides-container .genre-container,
-.layout-mobile #slides-container .rating-container {
-  padding: 0.14rem 0.45rem;
-  font-size: 0.72rem;
-}
-
-.layout-mobile #slides-container .plot-container {
-  -webkit-line-clamp: 2;
-  font-size: 0.84rem;
-  line-height: 1.42;
-  margin: 0.45rem 0 0;
-}
-
-.layout-mobile #slides-container .button-container {
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.layout-mobile #slides-container .play-button,
-.layout-mobile #slides-container .detail-button {
-  padding: 0.58rem 0.95rem !important;
-  font-size: 0.84rem;
-  min-height: 40px;
-  justify-content: center;
-  white-space: nowrap;
-}
-
-.layout-mobile #slides-container .arrow-button {
-  display: none;
-}
-
-.layout-mobile #slides-container .hero-controls-right,
-.layout-mobile #slides-container > .dots-container {
-  position: relative;
-  right: auto;
-  bottom: auto;
-  width: 100%;
-  justify-content: center;
-  padding: 0.65rem var(--prism-gutter) 0.9rem;
-  box-sizing: border-box;
-  background-color: var(--prism-bg);
-  z-index: 4;
 }
 
 .layout-mobile .prism-inline-spotlight-stage {
@@ -2458,18 +2457,39 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
     linear-gradient(180deg, rgba(4, 6, 12, 0.26) 0%, rgba(4, 6, 12, 0.04) 26%, rgba(4, 6, 12, 0.2) 45%, rgba(4, 6, 12, 0.76) 74%, rgba(4, 6, 12, 0.94) 100%);
 }
 
+.layout-mobile #slides-container .prism-hero-content,
 .layout-mobile .prism-inline-spotlight .prism-inline-content {
   max-width: 100%;
   width: 100%;
 }
 
-.layout-mobile .prism-inline-spotlight .logo-container {
+.layout-mobile #slides-container .logo-container,
+.layout-mobile #slides-container .prism-hero-logo {
+  max-width: min(260px, 76vw);
+}
+
+.layout-mobile #slides-container .logo-container {
+  margin-bottom: 0.5rem;
+}
+
+.layout-mobile #slides-container .prism-hero-logo {
+  max-height: 64px;
+}
+
+.layout-mobile #slides-container .prism-hero-title {
+  font-size: clamp(1.35rem, 6vw, 1.85rem);
+}
+
+.layout-mobile .prism-inline-spotlight .logo-container,
+.layout-mobile .prism-inline-spotlight .prism-hero-logo {
   max-width: min(230px, 74vw);
+}
+
+.layout-mobile .prism-inline-spotlight .logo-container {
   margin-bottom: 0.45rem;
 }
 
 .layout-mobile .prism-inline-spotlight .prism-hero-logo {
-  max-width: min(230px, 74vw);
   max-height: 56px;
 }
 
@@ -2477,46 +2497,68 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
   font-size: clamp(1.25rem, 5.5vw, 1.65rem);
 }
 
+.layout-mobile #slides-container .info-container,
 .layout-mobile .prism-inline-spotlight .info-container {
   gap: 0.35rem;
   font-size: 0.8rem;
 }
 
+.layout-mobile #slides-container .genre-container,
+.layout-mobile #slides-container .rating-container,
 .layout-mobile .prism-inline-spotlight .genre-container {
   padding: 0.14rem 0.45rem;
   font-size: 0.72rem;
 }
 
+.layout-mobile #slides-container .plot-container,
 .layout-mobile .prism-inline-spotlight .plot-container {
+  -webkit-line-clamp: 2;
   font-size: 0.84rem;
   line-height: 1.42;
   margin: 0.45rem 0 0;
 }
 
+.layout-mobile #slides-container .button-container,
 .layout-mobile .prism-inline-spotlight .button-container {
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
 
+.layout-mobile #slides-container .play-button,
+.layout-mobile #slides-container .detail-button,
 .layout-mobile .prism-inline-spotlight .play-button,
 .layout-mobile .prism-inline-spotlight .detail-button {
-  padding: 0.56rem 0.9rem !important;
+  padding: 0.58rem 0.95rem !important;
   font-size: 0.84rem;
   min-height: 40px;
   justify-content: center;
   white-space: nowrap;
 }
 
+.layout-mobile #slides-container .arrow-button,
 .layout-mobile .prism-inline-spotlight .arrow-button {
   display: none;
 }
 
+.layout-mobile #slides-container .hero-controls-right,
+.layout-mobile #slides-container > .dots-container,
 .layout-mobile .prism-inline-spotlight .hero-controls-right {
   position: relative;
   right: auto;
   bottom: auto;
   width: 100%;
   justify-content: center;
+}
+
+.layout-mobile #slides-container .hero-controls-right,
+.layout-mobile #slides-container > .dots-container {
+  padding: 0.65rem var(--prism-gutter) 0.9rem;
+  box-sizing: border-box;
+  background-color: var(--prism-bg);
+  z-index: 4;
+}
+
+.layout-mobile .prism-inline-spotlight .hero-controls-right {
   margin-top: 0.85rem;
 }
 
@@ -2551,77 +2593,10 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
       linear-gradient(180deg, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.04) 26%, rgba(0, 0, 0, 0.14) 44%, rgba(0, 0, 0, 0.72) 72%, var(--prism-bg) 100%);
   }
 
-  html:not(.layout-tv) #slides-container .prism-hero-content {
-    width: 100%;
-  }
-
   html:not(.layout-tv) #slides-container .prism-hero-reason {
     margin-bottom: 0.45rem;
     padding: 0.18rem 0.55rem;
     font-size: 0.68rem;
-  }
-
-  html:not(.layout-tv) #slides-container .logo-container {
-    max-width: min(260px, 76vw);
-    margin-bottom: 0.5rem;
-  }
-
-  html:not(.layout-tv) #slides-container .prism-hero-logo {
-    max-width: min(260px, 76vw);
-    max-height: 64px;
-  }
-
-  html:not(.layout-tv) #slides-container .prism-hero-title {
-    font-size: clamp(1.35rem, 6vw, 1.85rem);
-  }
-
-  html:not(.layout-tv) #slides-container .info-container {
-    gap: 0.35rem;
-    font-size: 0.8rem;
-  }
-
-  html:not(.layout-tv) #slides-container .genre-container,
-  html:not(.layout-tv) #slides-container .rating-container {
-    padding: 0.14rem 0.45rem;
-    font-size: 0.72rem;
-  }
-
-  html:not(.layout-tv) #slides-container .plot-container {
-    -webkit-line-clamp: 2;
-    font-size: 0.84rem;
-    line-height: 1.42;
-    margin: 0.45rem 0 0;
-  }
-
-  html:not(.layout-tv) #slides-container .button-container {
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-  }
-
-  html:not(.layout-tv) #slides-container .play-button,
-  html:not(.layout-tv) #slides-container .detail-button {
-    padding: 0.58rem 0.95rem !important;
-    font-size: 0.84rem;
-    min-height: 40px;
-    justify-content: center;
-    white-space: nowrap;
-  }
-
-  html:not(.layout-tv) #slides-container .arrow-button {
-    display: none;
-  }
-
-  html:not(.layout-tv) #slides-container .hero-controls-right,
-  html:not(.layout-tv) #slides-container > .dots-container {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    width: 100%;
-    justify-content: center;
-    padding: 0.65rem var(--prism-gutter) 0.9rem;
-    box-sizing: border-box;
-    background-color: var(--prism-bg);
-    z-index: 4;
   }
 
   html:not(.layout-tv) .prism-inline-spotlight-stage {
@@ -2635,18 +2610,39 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
       linear-gradient(180deg, rgba(4, 6, 12, 0.26) 0%, rgba(4, 6, 12, 0.04) 26%, rgba(4, 6, 12, 0.2) 45%, rgba(4, 6, 12, 0.76) 74%, rgba(4, 6, 12, 0.94) 100%);
   }
 
+  html:not(.layout-tv) #slides-container .prism-hero-content,
   html:not(.layout-tv) .prism-inline-spotlight .prism-inline-content {
     max-width: 100%;
     width: 100%;
   }
 
-  html:not(.layout-tv) .prism-inline-spotlight .logo-container {
+  html:not(.layout-tv) #slides-container .logo-container,
+  html:not(.layout-tv) #slides-container .prism-hero-logo {
+    max-width: min(260px, 76vw);
+  }
+
+  html:not(.layout-tv) #slides-container .logo-container {
+    margin-bottom: 0.5rem;
+  }
+
+  html:not(.layout-tv) #slides-container .prism-hero-logo {
+    max-height: 64px;
+  }
+
+  html:not(.layout-tv) #slides-container .prism-hero-title {
+    font-size: clamp(1.35rem, 6vw, 1.85rem);
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .logo-container,
+  html:not(.layout-tv) .prism-inline-spotlight .prism-hero-logo {
     max-width: min(230px, 74vw);
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .logo-container {
     margin-bottom: 0.45rem;
   }
 
   html:not(.layout-tv) .prism-inline-spotlight .prism-hero-logo {
-    max-width: min(230px, 74vw);
     max-height: 56px;
   }
 
@@ -2654,46 +2650,68 @@ html.layout-mobile .card:not(:focus-within) .cardOverlayContainer {
     font-size: clamp(1.25rem, 5.5vw, 1.65rem);
   }
 
+  html:not(.layout-tv) #slides-container .info-container,
   html:not(.layout-tv) .prism-inline-spotlight .info-container {
     gap: 0.35rem;
     font-size: 0.8rem;
   }
 
+  html:not(.layout-tv) #slides-container .genre-container,
+  html:not(.layout-tv) #slides-container .rating-container,
   html:not(.layout-tv) .prism-inline-spotlight .genre-container {
     padding: 0.14rem 0.45rem;
     font-size: 0.72rem;
   }
 
+  html:not(.layout-tv) #slides-container .plot-container,
   html:not(.layout-tv) .prism-inline-spotlight .plot-container {
+    -webkit-line-clamp: 2;
     font-size: 0.84rem;
     line-height: 1.42;
     margin: 0.45rem 0 0;
   }
 
+  html:not(.layout-tv) #slides-container .button-container,
   html:not(.layout-tv) .prism-inline-spotlight .button-container {
     gap: 0.5rem;
     margin-top: 0.75rem;
   }
 
+  html:not(.layout-tv) #slides-container .play-button,
+  html:not(.layout-tv) #slides-container .detail-button,
   html:not(.layout-tv) .prism-inline-spotlight .play-button,
   html:not(.layout-tv) .prism-inline-spotlight .detail-button {
-    padding: 0.56rem 0.9rem !important;
+    padding: 0.58rem 0.95rem !important;
     font-size: 0.84rem;
     min-height: 40px;
     justify-content: center;
     white-space: nowrap;
   }
 
+  html:not(.layout-tv) #slides-container .arrow-button,
   html:not(.layout-tv) .prism-inline-spotlight .arrow-button {
     display: none;
   }
 
+  html:not(.layout-tv) #slides-container .hero-controls-right,
+  html:not(.layout-tv) #slides-container > .dots-container,
   html:not(.layout-tv) .prism-inline-spotlight .hero-controls-right {
     position: relative;
     right: auto;
     bottom: auto;
     width: 100%;
     justify-content: center;
+  }
+
+  html:not(.layout-tv) #slides-container .hero-controls-right,
+  html:not(.layout-tv) #slides-container > .dots-container {
+    padding: 0.65rem var(--prism-gutter) 0.9rem;
+    box-sizing: border-box;
+    background-color: var(--prism-bg);
+    z-index: 4;
+  }
+
+  html:not(.layout-tv) .prism-inline-spotlight .hero-controls-right {
     margin-top: 0.85rem;
   }
 }
